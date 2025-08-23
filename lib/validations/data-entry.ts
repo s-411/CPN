@@ -16,9 +16,9 @@ export const dataEntrySchema = z.object({
     .refine((val) => Number.isFinite(val), 'Cost must be a valid number'),
     
   time: z.number()
-    .min(15, 'Time must be at least 15 minutes')
-    .max(1440, 'Time must be less than 24 hours (1440 minutes)')
-    .int('Time must be a whole number of minutes'),
+    .min(0.25, 'Time must be at least 0.25 hours (15 minutes)')
+    .max(24, 'Time must be less than 24 hours')
+    .refine((val) => Number.isFinite(val), 'Time must be a valid number'),
     
   nuts: z.number()
     .min(0, 'Number of nuts must be 0 or more')
@@ -42,11 +42,11 @@ export const NUTS_OPTIONS = [
 ] as const
 
 export const TIME_SUGGESTIONS = [
-  { value: 30, label: '30 minutes', description: 'Quick coffee/drink' },
-  { value: 60, label: '1 hour', description: 'Standard coffee date' },
-  { value: 120, label: '2 hours', description: 'Dinner or activity' },
-  { value: 180, label: '3 hours', description: 'Extended date' },
-  { value: 240, label: '4+ hours', description: 'Full day activity' }
+  { value: 0.5, label: '0.5 hours', description: 'Quick coffee/drink' },
+  { value: 1, label: '1 hour', description: 'Standard coffee date' },
+  { value: 2, label: '2 hours', description: 'Dinner or activity' },
+  { value: 3, label: '3 hours', description: 'Extended date' },
+  { value: 4, label: '4+ hours', description: 'Full day activity' }
 ] as const
 
 export const COST_SUGGESTIONS = [
@@ -71,7 +71,7 @@ export function validateCurrency(value: string): number | null {
 }
 
 export function validateTime(value: string): number | null {
-  const parsed = parseInt(value, 10)
+  const parsed = parseFloat(value)
   
   if (isNaN(parsed) || !isFinite(parsed)) {
     return null
@@ -89,23 +89,20 @@ export function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export function formatTime(minutes: number): string {
-  if (minutes < 60) {
-    return `${minutes} min`
+export function formatTime(hours: number): string {
+  if (hours === 1) {
+    return '1 hour'
   }
   
-  const hours = Math.floor(minutes / 60)
-  const remainingMinutes = minutes % 60
-  
-  if (remainingMinutes === 0) {
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+  if (hours % 1 === 0) {
+    return `${hours} hours`
   }
   
-  return `${hours}h ${remainingMinutes}m`
+  return `${hours} hours`
 }
 
 export function calculateEfficiencyMetrics(cost: number, time: number, nuts: number) {
-  const timeInHours = time / 60
+  const timeInHours = time // time is now already in hours
   const costPerNut = nuts > 0 ? cost / nuts : cost
   
   return {

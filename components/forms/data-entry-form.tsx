@@ -39,6 +39,7 @@ export function DataEntryForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [costInput, setCostInput] = useState('')
   const [timeInput, setTimeInput] = useState('')
+  const [dateInput, setDateInput] = useState('')
   
   const {
     control,
@@ -53,7 +54,7 @@ export function DataEntryForm({
     defaultValues: {
       date: '',
       cost: 0,
-      time: 60,
+      time: 1,
       nuts: 0,
       notes: ''
     }
@@ -64,13 +65,18 @@ export function DataEntryForm({
     if (existingData && !contextLoading) {
       setValue('date', existingData.date || '', { shouldDirty: false })
       setValue('cost', existingData.cost || 0, { shouldDirty: false })
-      setValue('time', existingData.time || 60, { shouldDirty: false })
+      setValue('time', existingData.time || 1, { shouldDirty: false })
       setValue('nuts', existingData.nuts || 0, { shouldDirty: false })
       setValue('notes', existingData.notes || '', { shouldDirty: false })
       
       // Set display inputs
       setCostInput(existingData.cost ? formatCurrency(existingData.cost) : '')
-      setTimeInput(existingData.time ? existingData.time.toString() : '60')
+      setTimeInput(existingData.time ? existingData.time.toString() : '1')
+      if (existingData.date) {
+        // Convert YYYY-MM-DD to MM/DD/YYYY for display
+        const [year, month, day] = existingData.date.split('-')
+        setDateInput(`${month}/${day}/${year}`)
+      }
     }
   }, [existingData, contextLoading, setValue])
 
@@ -82,7 +88,7 @@ export function DataEntryForm({
         saveDataEntryData({
           date: watchedFields.date || '',
           cost: watchedFields.cost || 0,
-          time: watchedFields.time || 60,
+          time: watchedFields.time || 1,
           nuts: watchedFields.nuts || 0,
           notes: watchedFields.notes || ''
         })
@@ -146,6 +152,43 @@ export function DataEntryForm({
     setValue('time', time, { shouldDirty: true })
   }
 
+  const handleDateChange = (value: string) => {
+    setDateInput(value)
+    
+    // Allow various formats while typing
+    const cleaned = value.replace(/\D/g, '')
+    
+    // Auto-format as user types
+    let formatted = ''
+    if (cleaned.length >= 2) {
+      formatted = cleaned.slice(0, 2) + '/'
+      if (cleaned.length >= 4) {
+        formatted += cleaned.slice(2, 4) + '/'
+        if (cleaned.length >= 4) {
+          formatted += cleaned.slice(4, 8)
+        }
+      } else if (cleaned.length > 2) {
+        formatted += cleaned.slice(2)
+      }
+    } else {
+      formatted = cleaned
+    }
+    
+    // Update display if auto-formatting
+    if (value !== formatted && cleaned.length > 0) {
+      setDateInput(formatted)
+    }
+    
+    // Validate and set the actual date value in YYYY-MM-DD format
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
+    const match = (formatted || value).match(dateRegex)
+    if (match) {
+      const [, month, day, year] = match
+      const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      setValue('date', isoDate, { shouldDirty: true })
+    }
+  }
+
   const isFormDisabled = isLoading || isSubmitting || contextLoading
   const today = new Date().toISOString().split('T')[0]
 
@@ -159,14 +202,6 @@ export function DataEntryForm({
         noValidate
       >
         {/* Form Header */}
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-bold text-cpn-white">
-            Experience Details
-          </h2>
-          <p className="text-cpn-gray text-sm">
-            Enter the details of your dating experience for analysis
-          </p>
-        </div>
 
 
         {/* Date Field */}
@@ -175,15 +210,17 @@ export function DataEntryForm({
           control={control}
           render={({ field }) => (
             <FormField
-              label="When did this happen?"
+              label="What date was it?"
               required
               error={errors.date?.message}
               className="space-y-2"
             >
               <input
-                {...field}
-                type="date"
-                max={today}
+                type="text"
+                placeholder="MM/DD/YYYY"
+                value={dateInput}
+                onChange={(e) => handleDateChange(e.target.value)}
+                maxLength={10}
                 disabled={isFormDisabled}
                 className={`
                   w-full min-h-[44px] p-3 rounded-lg border transition-all duration-200
@@ -198,7 +235,7 @@ export function DataEntryForm({
                 aria-describedby={errors.date ? 'date-error' : undefined}
               />
               <p className="text-xs text-cpn-gray">
-                Select the date when this experience occurred
+                Enter the date in MM/DD/YYYY format
               </p>
             </FormField>
           )}
@@ -263,10 +300,11 @@ export function DataEntryForm({
             <div className="flex items-center space-x-2">
               <input
                 type="number"
-                inputMode="numeric"
-                placeholder="60"
-                min={15}
-                max={1440}
+                inputMode="decimal"
+                placeholder="1"
+                min={0.25}
+                max={24}
+                step={0.25}
                 value={timeInput}
                 onChange={(e) => handleTimeChange(e.target.value)}
                 disabled={isFormDisabled}
@@ -282,7 +320,7 @@ export function DataEntryForm({
                 `}
                 aria-describedby={errors.time ? 'time-error' : 'time-help'}
               />
-              <span className="text-cpn-gray text-sm">minutes</span>
+              <span className="text-cpn-gray text-sm">hours</span>
             </div>
             
             {/* Time Suggestions */}
@@ -371,67 +409,16 @@ export function DataEntryForm({
               </div>
               
               <p className="text-xs text-cpn-gray text-center">
-                Select the number of nuts you achieved (0-5)
+                Select the number of nuts you bust (0-5)
               </p>
             </FormField>
           )}
         />
 
         {/* Notes Field */}
-        <Controller
-          name="notes"
-          control={control}
-          render={({ field }) => (
-            <FormField
-              label="Additional notes (optional)"
-              error={errors.notes?.message}
-              className="space-y-2"
-            >
-              <textarea
-                {...field}
-                placeholder="Any additional details or observations..."
-                maxLength={500}
-                rows={3}
-                disabled={isFormDisabled}
-                className={`
-                  w-full p-3 rounded-lg border transition-all duration-200
-                  bg-cpn-dark text-cpn-white placeholder-cpn-gray resize-none
-                  focus:ring-2 focus:ring-cpn-yellow focus:border-cpn-yellow outline-none
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  ${errors.notes 
-                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
-                    : 'border-cpn-gray hover:border-cpn-white'
-                  }
-                `}
-                aria-describedby={errors.notes ? 'notes-error' : 'notes-help'}
-              />
-              <p id="notes-help" className="text-xs text-cpn-gray">
-                {field.value?.length || 0}/500 characters
-              </p>
-            </FormField>
-          )}
-        />
 
         {/* Form Actions */}
         <div className="space-y-4 pt-4">
-          {showBackButton && (
-            <button
-              type="button"
-              onClick={handleBackClick}
-              disabled={isFormDisabled}
-              className="
-                w-full min-h-[44px] py-3 px-6 rounded-cpn
-                bg-transparent border border-cpn-gray text-cpn-gray
-                hover:border-cpn-white hover:text-cpn-white
-                disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all duration-200
-                focus:ring-2 focus:ring-cpn-yellow focus:outline-none
-              "
-            >
-              Back
-            </button>
-          )}
-          
           <button
             type="submit"
             disabled={isFormDisabled || !isValid}
@@ -451,14 +438,27 @@ export function DataEntryForm({
               <span>Calculate CPN</span>
             )}
           </button>
+          
+          {showBackButton && (
+            <button
+              type="button"
+              onClick={handleBackClick}
+              disabled={isFormDisabled}
+              className="
+                w-full min-h-[44px] py-3 px-6 rounded-cpn
+                bg-transparent border border-cpn-gray text-cpn-gray
+                hover:border-cpn-white hover:text-cpn-white
+                disabled:opacity-50 disabled:cursor-not-allowed
+                transition-all duration-200
+                focus:ring-2 focus:ring-cpn-yellow focus:outline-none
+              "
+            >
+              Back
+            </button>
+          )}
         </div>
 
         {/* Form Footer */}
-        <div className="text-center">
-          <p className="text-xs text-cpn-gray">
-            Your data is secure and temporarily saved
-          </p>
-        </div>
       </form>
     </div>
   )

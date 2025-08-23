@@ -43,9 +43,9 @@ export function ProfileForm({
   reValidateMode: 'onBlur',
   defaultValues: {
     firstName: '',
-    age: 18,            // ← change from undefined to 18
+    age: 22,            // ← change from undefined to 22
     ethnicity: '',
-    rating: 5.0
+    rating: 6.0
   }
 })
 
@@ -114,25 +114,6 @@ export function ProfileForm({
         noValidate
       >
         {/* Form Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold text-cpn-white">
-            Add Your First Profile
-          </h1>
-          <p className="text-cpn-gray text-sm">
-            Enter basic information to start tracking your efficiency
-          </p>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="flex items-center justify-center space-x-2 pb-2">
-          <div className="w-3 h-3 bg-cpn-yellow rounded-full" />
-          <div className="w-8 h-1 bg-cpn-gray rounded" />
-          <div className="w-3 h-3 bg-cpn-gray rounded-full" />
-          <div className="w-8 h-1 bg-cpn-gray rounded" />
-          <div className="w-3 h-3 bg-cpn-gray rounded-full" />
-          <div className="w-8 h-1 bg-cpn-gray rounded" />
-          <div className="w-3 h-3 bg-cpn-gray rounded-full" />
-        </div>
 
         {/* First Name Field */}
         <Controller
@@ -229,7 +210,7 @@ export function ProfileForm({
           control={control}
           render={({ field }) => (
             <RatingSelector
-              label="Rating"
+              label="Hotness Rating"
               value={field.value || 5.0}
               onChange={field.onChange}
               error={errors.rating?.message}
@@ -281,11 +262,6 @@ export function ProfileForm({
         </div>
 
         {/* Form Footer */}
-        <div className="text-center">
-          <p className="text-xs text-cpn-gray">
-            Step 1 of 4 • Your data is temporarily saved as you type
-          </p>
-        </div>
       </form>
     </div>
   )

@@ -103,7 +103,7 @@ function DataEntryContent() {
       {/* Page container */}
       <div className="relative max-w-md mx-auto">
         {/* Page header */}
-        <header className="text-center mb-8">
+        <header className="text-center mb-0">
           <div className="mb-4">
             {/* CPN Logo */}
             <div className="w-16 h-16 mx-auto mb-4 bg-cpn-yellow rounded-full flex items-center justify-center">
@@ -114,12 +114,11 @@ function DataEntryContent() {
               id="page-title"
               className="text-3xl font-bold text-cpn-white mb-2 font-national"
             >
-              Track Your Experience
+              Add Expenses
             </h1>
             
             <p className="text-cpn-gray text-lg leading-relaxed font-klarheit">
-              Enter the details of your dating experience to calculate your 
-              cost per interaction and efficiency metrics.
+              Enter the details of a date/event whith her.
             </p>
           </div>
 
@@ -132,8 +131,8 @@ function DataEntryContent() {
             <div className="w-3 h-3 bg-cpn-gray rounded-full" aria-label="Step 3" />
           </div>
 
-          <div className="text-sm text-cpn-gray mb-8">
-            Step 2 of 3 • {progress.percentComplete}% Complete
+          <div className="text-sm text-cpn-gray mb-0">
+            Step 2 of 3
           </div>
         </header>
 

@@ -83,7 +83,6 @@ export function RatingSelector({
       required={required}
       error={error}
       className={className}
-      description="Rate from 5.0 to 10.0 in half-point increments"
     >
       <div className="space-y-4">
         {/* Current Rating Display */}
@@ -204,9 +203,6 @@ export function RatingSelector({
           <div className="flex justify-between">
             <span>5.0-6.0: Below Average</span>
             <span>8.5-10.0: Exceptional</span>
-          </div>
-          <div className="flex justify-center">
-            <span>6.5-8.0: Good to Very Good</span>
           </div>
         </div>
       </div>

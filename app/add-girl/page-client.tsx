@@ -65,7 +65,7 @@ function AddGirlContent() {
       {/* Page container */}
       <div className="relative max-w-md mx-auto">
         {/* Page header */}
-        <header className="text-center mb-8">
+        <header className="text-center mb-0">
           <div className="mb-4">
             {/* CPN Logo */}
             <div className="w-16 h-16 mx-auto mb-4 bg-cpn-yellow rounded-full flex items-center justify-center">
@@ -93,8 +93,8 @@ function AddGirlContent() {
             <div className="w-3 h-3 bg-cpn-gray rounded-full" aria-label="Step 3" />
           </div>
 
-          <div className="text-sm text-cpn-gray mb-8">
-            Step {progress.currentStep === 'profile' ? 1 : 2} of 3 • {progress.percentComplete}% Complete
+          <div className="text-sm text-cpn-gray mb-0">
+            Step {progress.currentStep === 'profile' ? 1 : 2} of 3
           </div>
         </header>
 

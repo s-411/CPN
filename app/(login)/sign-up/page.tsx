@@ -9,10 +9,10 @@ export default function SignUpPage() {
             <span className="text-2xl font-bold text-cpn-dark">CPN</span>
           </div>
           <h1 className="text-3xl font-bold text-cpn-white mb-2">
-            Get Started
+            You’re almost there
           </h1>
           <p className="text-cpn-gray">
-            Create your account to track your CPN
+            Drop your email to reveal your CPN and see your date analytics—trends, spend vs outcome, and more.
           </p>
         </div>
         
