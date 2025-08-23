@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Create the data entry form as step 2 in the CPN onboarding funnel, capturing essential dating interaction data (date, cost, time spent, outcome) with mobile-optimized inputs and seamless integration with the profile creation flow. This form enables users to input their first interaction data and progress to the CPN results page where they'll see their personalized efficiency score, maintaining engagement momentum toward account creation and premium conversion.

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
-import { CircleIcon, Home, LogOut } from 'lucide-react';
+import { Home, LogOut, Trophy, BarChart3, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,68 +11,62 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { signOut } from '@/app/(login)/actions';
 import { useRouter } from 'next/navigation';
-import { User } from '@/lib/db/schema';
-import useSWR, { mutate } from 'swr';
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useAuth } from '@/hooks/use-auth';
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const { user, isLoaded, isSignedIn, signOut, email, firstName, lastName, fullName, imageUrl } = useAuth();
   const router = useRouter();
 
   async function handleSignOut() {
     await signOut();
-    mutate('/api/user');
     router.push('/');
   }
 
-  if (!user) {
+  if (!isLoaded) {
+    return <div className="h-9 w-9 animate-pulse bg-cpn-gray/20 rounded-full" />;
+  }
+
+  if (!isSignedIn || !user) {
     return (
-      <>
-        <Link
-          href="/pricing"
-          className="text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-          Pricing
-        </Link>
-        <Button asChild className="rounded-full">
-          <Link href="/sign-up">Sign Up</Link>
-        </Button>
-      </>
+      <Button asChild className="bg-cpn-yellow text-cpn-dark hover:bg-cpn-yellow/80 rounded-full px-6">
+        <Link href="/sign-up">Sign Up</Link>
+      </Button>
     );
   }
+
+  const initials = firstName && lastName 
+    ? `${firstName[0]}${lastName[0]}`
+    : email?.slice(0, 2).toUpperCase() || 'U';
 
   return (
     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger>
-        <Avatar className="cursor-pointer size-9">
-          <AvatarImage alt={user.name || ''} />
-          <AvatarFallback>
-            {user.email
-              .split(' ')
-              .map((n) => n[0])
-              .join('')}
+        <Avatar className="cursor-pointer size-9 border-2 border-cpn-yellow">
+          <AvatarImage src={imageUrl} alt={fullName || email || ''} />
+          <AvatarFallback className="bg-cpn-dark text-cpn-yellow">
+            {initials}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="flex flex-col gap-1">
-        <DropdownMenuItem className="cursor-pointer">
+      <DropdownMenuContent align="end" className="bg-cpn-dark border-cpn-gray/20 text-cpn-white">
+        <DropdownMenuItem className="cursor-pointer hover:bg-cpn-gray/10">
           <Link href="/dashboard" className="flex w-full items-center">
             <Home className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
-        <form action={handleSignOut} className="w-full">
-          <button type="submit" className="flex w-full">
-            <DropdownMenuItem className="w-full flex-1 cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign out</span>
-            </DropdownMenuItem>
-          </button>
-        </form>
+        <DropdownMenuItem className="cursor-pointer hover:bg-cpn-gray/10">
+          <Link href="/cpn-results" className="flex w-full items-center">
+            <Trophy className="mr-2 h-4 w-4" />
+            <span>CPN Results</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer hover:bg-cpn-gray/10" onClick={handleSignOut}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Sign out</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -80,11 +74,11 @@ function UserMenu() {
 
 function Header() {
   return (
-    <header className="border-b border-gray-200">
+    <header className="bg-cpn-dark border-b border-cpn-gray/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">ACME</span>
+          <span className="text-2xl font-bold text-cpn-yellow">CPN</span>
+          <span className="ml-2 text-lg text-cpn-white">Calculator</span>
         </Link>
         <div className="flex items-center space-x-4">
           <Suspense fallback={<div className="h-9" />}>
@@ -98,9 +92,11 @@ function Header() {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <section className="flex flex-col min-h-screen">
+    <section className="flex flex-col min-h-screen bg-cpn-dark text-cpn-white">
       <Header />
-      {children}
+      <main className="flex-1">
+        {children}
+      </main>
     </section>
   );
 }

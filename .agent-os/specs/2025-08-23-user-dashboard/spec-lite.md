@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Create a comprehensive user dashboard that displays a single user profile view with key CPN metrics, interactions history, and achievement tracking. This dashboard will serve as the primary interface for users to view their personal CPN data including current score with peer comparisons, recent interaction history with cost analysis, earned achievements, and sharing analytics all in a unified layout following the CPN design system.

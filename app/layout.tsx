@@ -1,7 +1,8 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { getUser, getTeamForUser } from '@/lib/db/queries';
+// import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
+import { ClerkProvider } from '@clerk/nextjs';
 
 export const metadata: Metadata = {
   title: 'CPN - Cost Per Nut',
@@ -18,24 +19,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className="dark"
-    >
-      <body className="min-h-[100dvh] bg-cpn-dark text-cpn-white font-body antialiased">
-        <SWRConfig
-          value={{
-            fallback: {
-              // We do NOT await here
-              // Only components that read this data will suspend
-              '/api/user': getUser(),
-              '/api/team': getTeamForUser()
-            }
-          }}
-        >
-          {children}
-        </SWRConfig>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className="dark"
+      >
+        <body className="min-h-[100dvh] bg-cpn-dark text-cpn-white font-body antialiased">
+          <SWRConfig
+            value={{
+              fallback: {
+                // Database calls temporarily disabled for component testing
+                // '/api/user': getUser(),
+                // '/api/team': getTeamForUser()
+              }
+            }}
+          >
+            {children}
+          </SWRConfig>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -1,7 +1,8 @@
 import { stripe } from '../payments/stripe';
 import { db } from './drizzle';
-import { users, teams, teamMembers } from './schema';
+import { users, teams, teamMembers, achievements } from './schema';
 import { hashPassword } from '@/lib/auth/session';
+import { eq } from 'drizzle-orm';
 
 async function createStripeProducts() {
   console.log('Creating Stripe products and prices...');
@@ -39,6 +40,96 @@ async function createStripeProducts() {
   console.log('Stripe products and prices created successfully.');
 }
 
+async function seedAchievements() {
+  console.log('🌱 Seeding achievements...');
+
+  const initialAchievements = [
+    {
+      name: 'First Score',
+      description: 'Calculate your first CPN score',
+      iconPath: '/icons/first-score.svg',
+      badgeColor: '#4F46E5',
+      criteria: {
+        type: 'first_calculation',
+        threshold: 1
+      },
+      displayOrder: 1,
+      active: true
+    },
+    {
+      name: 'High Performer',
+      description: 'Achieve a CPN score of 80 or higher',
+      iconPath: '/icons/high-performer.svg',
+      badgeColor: '#10B981',
+      criteria: {
+        type: 'score_threshold',
+        threshold: 80
+      },
+      displayOrder: 2,
+      active: true
+    },
+    {
+      name: 'Elite Status',
+      description: 'Achieve a CPN score of 90 or higher',
+      iconPath: '/icons/elite-status.svg',
+      badgeColor: '#F59E0B',
+      criteria: {
+        type: 'score_threshold',
+        threshold: 90
+      },
+      displayOrder: 3,
+      active: true
+    },
+    {
+      name: 'Top Percentile',
+      description: 'Score in the top 10% of all users',
+      iconPath: '/icons/top-percentile.svg',
+      badgeColor: '#8B5CF6',
+      criteria: {
+        type: 'percentile_rank',
+        threshold: 90
+      },
+      displayOrder: 4,
+      active: true
+    },
+    {
+      name: 'Social Sharer',
+      description: 'Share your results on social media',
+      iconPath: '/icons/social-sharer.svg',
+      badgeColor: '#06B6D4',
+      criteria: {
+        type: 'social_share',
+        threshold: 1
+      },
+      displayOrder: 5,
+      active: true
+    }
+  ];
+
+  try {
+    for (const achievement of initialAchievements) {
+      // Check if achievement already exists
+      const existing = await db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.name, achievement.name))
+        .limit(1);
+
+      if (existing.length === 0) {
+        await db.insert(achievements).values(achievement);
+        console.log(`✅ Created achievement: ${achievement.name}`);
+      } else {
+        console.log(`⏭️  Achievement already exists: ${achievement.name}`);
+      }
+    }
+
+    console.log('🎉 Achievement seeding completed!');
+  } catch (error) {
+    console.error('❌ Error seeding achievements:', error);
+    throw error;
+  }
+}
+
 async function seed() {
   const email = 'test@test.com';
   const password = 'admin123';
@@ -71,6 +162,7 @@ async function seed() {
   });
 
   await createStripeProducts();
+  await seedAchievements();
 }
 
 seed()

@@ -5,9 +5,15 @@
 
 agent_os_version: 1.4.1
 
+# Audio notifications
+notifications:
+  enabled: true
+  script: ".claude/notify.sh"
+
 agents:
   claude_code:
     enabled: true
+    notifications: true
   cursor:
     enabled: false
 

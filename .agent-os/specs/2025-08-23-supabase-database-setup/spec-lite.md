@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Migrate CPN application from local PostgreSQL + Drizzle ORM to Supabase to enable cloud-based user data persistence and Clerk authentication integration. This migration preserves existing schema while adding Clerk user ID mapping and implementing Row Level Security for multi-tenant data isolation. The setup provides the foundational database infrastructure needed for production deployment and seamless integration with magic link authentication.
