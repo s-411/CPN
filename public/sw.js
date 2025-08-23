@@ -8,10 +8,9 @@ const DYNAMIC_CACHE = 'cpn-dynamic-v1'
 // Define which files to cache for offline use
 const STATIC_FILES = [
   '/',
-  '/add-girl',
   '/manifest.json',
-  '/offline',
   // Core CSS and JS will be automatically added by Next.js
+  // Note: Only include files that actually exist to avoid cache errors
 ]
 
 // Define API endpoints that should be cached
@@ -242,9 +241,23 @@ async function handleStaticRequest(request) {
       cache.put(request, networkResponse.clone())
       return networkResponse
     }
+    
+    // Don't cache or throw errors for missing assets (404s)
+    // Just return the 404 response
+    if (networkResponse.status === 404) {
+      return networkResponse
+    }
+    
     throw new Error(`Static asset fetch failed: ${networkResponse.status}`)
   } catch (error) {
     console.error('Service Worker: Static asset failed', error)
+    
+    // For development, return a network error instead of throwing
+    const url = new URL(request.url)
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+      return Response.error()
+    }
+    
     throw error
   }
 }

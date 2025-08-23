@@ -76,12 +76,11 @@ function AddGirlContent() {
               id="page-title"
               className="text-3xl font-bold text-cpn-white mb-2 font-national"
             >
-              Add Your First Profile
+              Add A Girl
             </h1>
             
             <p className="text-cpn-gray text-lg leading-relaxed font-klarheit">
-              Start tracking your dating efficiency by adding your first profile. 
-              We'll help you measure what matters.
+              Let's tracking your dating efficiency.
             </p>
           </div>
 
