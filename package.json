@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
-    "@hookform/resolvers": "^5.2.1",
+    "@hookform/resolvers": "^3.3.2",
     "@supabase/supabase-js": "^2.56.0",
     "@tailwindcss/postcss": "4.1.7",
     "@types/node": "^22.15.18",
@@ -39,7 +39,7 @@
     "postcss": "^8.5.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "react-hook-form": "^8.2.5",
+    "react-hook-form": "^7.52.2",
     "sass": "^1.87.0",
     "server-only": "^0.0.1",
     "sonner": "^2.1.1",
