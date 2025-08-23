@@ -17,7 +17,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "postinstall": "echo 'Dependencies installed successfully'",
-    "heroku-postbuild": "pnpm build",
+    "heroku-postbuild": "pnpm install --force && pnpm build",
     "prebuild": "rm -f package-lock.json yarn.lock npm-shrinkwrap.json"
   },
   "dependencies": {
