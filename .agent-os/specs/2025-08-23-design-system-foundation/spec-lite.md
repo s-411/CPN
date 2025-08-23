@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Establish a comprehensive design system foundation with consistent brand colors (#f2f661 yellow, #1f1f1f dark, #ffffff/#ABABAB text), typography (National 2 Condensed Bold headings, Es Klarheit Grotesk body), and component styling that will be used throughout the entire CPN application. This system ensures visual consistency, improves development efficiency, and creates a professional user experience aligned with the brand identity for data-driven men aged 18-45.
