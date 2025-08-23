@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Create the "Add Girl" profile creation page as the critical entry point in the CPN onboarding funnel, capturing essential profile information (name, age, ethnicity, rating) with a streamlined, conversion-optimized form. This page leads users directly into the data entry flow, building momentum toward account creation and premium conversion while maintaining session context for seamless user experience.
