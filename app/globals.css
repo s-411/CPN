@@ -1,55 +1,45 @@
-@import "tailwindcss";
-
-/* CPN Brand Design System */
-@custom-variant dark (&:is(.dark *));
-
-@theme {
-  /* CPN Brand Colors */
-  --color-cpn-yellow: #f2f661;
-  --color-cpn-dark: #1f1f1f;
-  --color-cpn-white: #ffffff;
-  --color-cpn-gray: #ABABAB;
-
-  /* Semantic Color Mappings for Dark Theme */
-  --color-background: var(--color-cpn-dark);
-  --color-foreground: var(--color-cpn-white);
-  --color-primary: var(--color-cpn-yellow);
-  --color-primary-foreground: var(--color-cpn-dark);
-  --color-secondary: var(--color-cpn-gray);
-  --color-secondary-foreground: var(--color-cpn-dark);
-  --color-muted: var(--color-cpn-dark);
-  --color-muted-foreground: var(--color-cpn-gray);
-  --color-accent: var(--color-cpn-yellow);
-  --color-accent-foreground: var(--color-cpn-dark);
-  --color-border: var(--color-cpn-gray);
-  --color-input: var(--color-cpn-dark);
-  --color-ring: var(--color-cpn-yellow);
-
-  /* Additional UI Colors */
-  --color-card: var(--color-cpn-dark);
-  --color-card-foreground: var(--color-cpn-white);
-  --color-popover: var(--color-cpn-dark);
-  --color-popover-foreground: var(--color-cpn-white);
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: var(--color-cpn-white);
-
-  /* Border Radius */
-  --radius: 0.5rem;
-  --radius-cpn-button: 100px;
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  /* Typography */
-  --font-heading: 'National2Condensed', 'Arial Black', sans-serif;
-  --font-body: 'ESKlarheit', 'Inter', system-ui, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Base styles for CPN dark theme */
 @layer base {
   :root {
     /* Force dark theme by default */
     color-scheme: dark;
+    
+    /* CPN Brand Colors */
+    --cpn-yellow: #f2f661;
+    --cpn-dark: #1f1f1f;
+    --cpn-white: #ffffff;
+    --cpn-gray: #ABABAB;
+
+    /* Semantic Color Mappings for Dark Theme */
+    --background: var(--cpn-dark);
+    --foreground: var(--cpn-white);
+    --primary: var(--cpn-yellow);
+    --primary-foreground: var(--cpn-dark);
+    --secondary: var(--cpn-gray);
+    --secondary-foreground: var(--cpn-dark);
+    --muted: var(--cpn-dark);
+    --muted-foreground: var(--cpn-gray);
+    --accent: var(--cpn-yellow);
+    --accent-foreground: var(--cpn-dark);
+    --border: var(--cpn-gray);
+    --input: var(--cpn-dark);
+    --ring: var(--cpn-yellow);
+
+    /* Additional UI Colors */
+    --card: var(--cpn-dark);
+    --card-foreground: var(--cpn-white);
+    --popover: var(--cpn-dark);
+    --popover-foreground: var(--cpn-white);
+    --destructive: #ef4444;
+    --destructive-foreground: var(--cpn-white);
+
+    /* Border Radius */
+    --radius: 0.5rem;
+    --radius-cpn-button: 100px;
   }
 
   * {

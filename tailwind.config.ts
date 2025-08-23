@@ -10,34 +10,46 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // CPN Brand Colors
-        'cpn-yellow': '#f2f661',
-        'cpn-dark': '#1f1f1f',
-        'cpn-white': '#ffffff',
-        'cpn-gray': '#ABABAB',
+        // CPN Brand Colors (direct values)
+        'cpn-yellow': 'var(--cpn-yellow)',
+        'cpn-dark': 'var(--cpn-dark)',
+        'cpn-white': 'var(--cpn-white)',
+        'cpn-gray': 'var(--cpn-gray)',
         
-        // Tailwind CSS 4 compatible color definitions
+        // Semantic colors using CSS variables
         background: 'var(--background)',
         foreground: 'var(--foreground)',
         primary: {
-          DEFAULT: '#f2f661',
-          foreground: '#1f1f1f',
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
         },
         secondary: {
-          DEFAULT: '#ABABAB',
-          foreground: '#1f1f1f',
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)',
         },
         muted: {
-          DEFAULT: '#1f1f1f',
-          foreground: '#ABABAB',
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)',
         },
         accent: {
-          DEFAULT: '#f2f661',
-          foreground: '#1f1f1f',
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
         },
-        border: '#ABABAB',
-        input: '#1f1f1f',
-        ring: '#f2f661',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)',
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)',
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)',
+          foreground: 'var(--destructive-foreground)',
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
       },
       fontFamily: {
         // Custom brand fonts
