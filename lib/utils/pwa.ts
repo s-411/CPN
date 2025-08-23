@@ -27,6 +27,12 @@ export async function registerServiceWorker(): Promise<boolean> {
     return false
   }
 
+  // Skip service worker registration in development if disabled
+  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DISABLE_SERVICE_WORKER === 'true') {
+    console.log('PWA: Service worker disabled for development')
+    return false
+  }
+
   try {
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',

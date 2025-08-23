@@ -97,17 +97,31 @@ async function handleDocumentRequest(request) {
       return networkResponse
     }
     
+    // For non-OK responses in development, just return them
+    // This prevents the offline page from showing for 404s, 500s, etc.
+    const url = new URL(request.url)
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+      return networkResponse
+    }
+    
     throw new Error(`Network response not ok: ${networkResponse.status}`)
   } catch (error) {
     console.log('Service Worker: Network failed, trying cache', error.message)
     
-    // Fallback to cache
+    // In development, don't show offline page - just fail the request
+    const url = new URL(request.url)
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+      // Return a network error response so the browser shows its default error
+      return Response.error()
+    }
+    
+    // Fallback to cache for production
     const cachedResponse = await caches.match(request)
     if (cachedResponse) {
       return cachedResponse
     }
     
-    // If no cache, return offline page
+    // If no cache, return offline page (production only)
     const offlineResponse = await caches.match('/offline')
     if (offlineResponse) {
       return offlineResponse
