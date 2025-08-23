@@ -16,7 +16,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "postinstall": "echo 'Dependencies installed successfully'"
+    "postinstall": "echo 'Dependencies installed successfully'",
+    "heroku-postbuild": "pnpm build"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
