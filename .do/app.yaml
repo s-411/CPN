@@ -1,0 +1,23 @@
+name: cpn-calculator
+region: nyc
+features:
+  - buildpack-stack=ubuntu-22
+
+services:
+  - name: web
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: YOUR_GITHUB_REPO
+    build_command: pnpm install && pnpm build
+    run_command: pnpm start
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
