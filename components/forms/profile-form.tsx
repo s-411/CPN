@@ -31,23 +31,24 @@ export function ProfileForm({
   const existingProfileData = useOnboardingStep('profile')
   const [isSubmitting, setIsSubmitting] = useState(false)
   
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, isDirty, isValid }
-  } = useForm({
-    resolver: zodResolver(profileSchema),
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    defaultValues: {
-      firstName: '',
-      age: undefined as number | undefined,
-      ethnicity: '',
-      rating: 5.0
-    }
-  })
+ const {
+  control,
+  handleSubmit,
+  watch,
+  setValue,
+  formState: { errors, isDirty, isValid }
+} = useForm<ProfileFormData>({
+  resolver: zodResolver(profileSchema),
+  mode: 'onBlur',
+  reValidateMode: 'onBlur',
+  defaultValues: {
+    firstName: '',
+    age: 18,            // ← change from undefined to 18
+    ethnicity: '',
+    rating: 5.0
+  }
+})
+
 
   // Load data from onboarding context on mount
   useEffect(() => {
@@ -185,7 +186,7 @@ export function ProfileForm({
                 placeholder="25"
                 min={18}
                 max={99}
-                value={value || ''}
+                value={value ?? 18}
                 onChange={(e) => {
                   const num = parseInt(e.target.value)
                   onChange(isNaN(num) ? undefined : num)

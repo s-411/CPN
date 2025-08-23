@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Avatar as AvatarPrimitive } from "radix-ui";;
+// REPLACE anything like: import * as Avatar from "radix-ui" or "radix-ui/react-avatar"
+import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils";
 

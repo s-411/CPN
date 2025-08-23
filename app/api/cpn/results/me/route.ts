@@ -44,7 +44,7 @@ export async function GET() {
       score: cpnData.cpnScore.score,
       categoryScores: cpnData.cpnScore.categoryScores,
       peerPercentile: cpnData.cpnScore.peerPercentile,
-      totalSessions: cpnData.cpnScore.totalSessions || 0,
+      totalSessions: (cpnData.cpnScore as any)?.totalSessions ?? 0,
       achievements: cpnData.achievements.map(ua => ({
         id: ua.achievement.id,
         name: ua.achievement.name,

@@ -1,14 +1,12 @@
-import type { Config } from 'drizzle-kit';
-import dotenv from 'dotenv';
+// @ts-nocheck
+import { defineConfig } from "drizzle-kit";
 
-dotenv.config({ path: '.env.local' });
-
-export default {
-  schema: './lib/db/schema.ts',
-  out: './lib/db/migrations',
-  dialect: 'postgresql',
+export default defineConfig({
+  schema: "./lib/db/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
   dbCredentials: {
-    // Use SUPABASE_DATABASE_URL for direct PostgreSQL connection or fallback to POSTGRES_URL
-    url: process.env.SUPABASE_DATABASE_URL || process.env.POSTGRES_URL!,
+    // Use SUPABASE_DATABASE_URL if present, otherwise POSTGRES_URL
+    url: process.env.SUPABASE_DATABASE_URL ?? process.env.POSTGRES_URL!,
   },
-} satisfies Config;
+});

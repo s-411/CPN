@@ -1,3 +1,4 @@
+'use client';
 import { ProfileForm } from '@/components/forms/profile-form'
 import type { ProfileFormData } from '@/types/profile'
 

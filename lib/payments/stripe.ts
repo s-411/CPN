@@ -7,9 +7,8 @@ import {
   updateTeamSubscription
 } from '@/lib/db/queries';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-07-30.basil'
-});
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
 
 export async function createCheckoutSession({
   team,
