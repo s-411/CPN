@@ -19,7 +19,7 @@ The dashboard will display the user's profile information, current CPN score wit
 
 As a CPN user, I want to see my interaction history with cost analysis, so that I can understand my spending patterns and optimize my CPN investments.
 
-The dashboard includes a detailed view of user interactions showing date, cost, time spent, nuts earned, and personal notes with the ability to view trends over time.
+The dashboard includes a detailed view of user interactions showing date, cost, time spent, nuts, and personal notes with the ability to view trends over time.
 
 ### Achievement Progress Tracking
 

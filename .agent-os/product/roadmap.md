@@ -21,7 +21,7 @@
 
 - Supabase project setup and database schema design
 - Stripe account configuration and webhook setup  
-- Domain setup (cost-per-template) and SSL configuration
+- Domain setup (cost-per-nut.com) and SSL configuration
 - Magic link authentication provider selection (Supabase vs Clerk)
 
 ## Phase 2: Core Analytics & Multi-Profile (Weeks 7-10)
