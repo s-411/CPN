@@ -1,0 +1,130 @@
+{
+  "name": "CPN Tracker - Dating Efficiency Analytics",
+  "short_name": "CPN Tracker",
+  "description": "Track your dating efficiency, measure cost per result, and optimize your approach with comprehensive analytics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f1f1f",
+  "theme_color": "#f2f661",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["lifestyle", "productivity", "social"],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-profile.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "platform": "mobile",
+      "label": "Profile creation on mobile"
+    },
+    {
+      "src": "/screenshots/desktop-dashboard.png", 
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Analytics dashboard"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add New Profile",
+      "short_name": "Add Profile",
+      "description": "Quickly add a new profile to track",
+      "url": "/add-girl",
+      "icons": [
+        {
+          "src": "/icons/shortcut-add.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Analytics", 
+      "short_name": "Analytics",
+      "description": "View your efficiency analytics",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/shortcut-analytics.png",
+          "sizes": "192x192", 
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "features": [
+    "offline-support",
+    "push-notifications",
+    "background-sync",
+    "cross-origin-embedder-policy-require-corp"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+cpntracker",
+      "url": "/import?data=%s"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://cpntracker.com/manifest.json"
+    }
+  ]
+}

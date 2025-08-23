@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Implement Clerk Magic Link authentication system to replace anonymous session-based onboarding with secure, passwordless user accounts. Users will sign up using only their email address, receive magic links for instant authentication, and maintain persistent CPN data across sessions and devices. The implementation preserves the existing onboarding flow (/add-girl → /data-entry → /cpn-result) while adding user account management, data persistence, and security. All authentication UI will match the CPN design system with dark theme and yellow accents, maintaining mobile-first responsive design and PWA functionality.

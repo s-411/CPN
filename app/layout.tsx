@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { getUser, getTeamForUser } from '@/lib/db/queries';
+// import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 
 export const metadata: Metadata = {
@@ -26,10 +26,9 @@ export default function RootLayout({
         <SWRConfig
           value={{
             fallback: {
-              // We do NOT await here
-              // Only components that read this data will suspend
-              '/api/user': getUser(),
-              '/api/team': getTeamForUser()
+              // Database calls temporarily disabled for component testing
+              // '/api/user': getUser(),
+              // '/api/team': getTeamForUser()
             }
           }}
         >

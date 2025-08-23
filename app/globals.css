@@ -77,7 +77,7 @@
   }
 
   .btn-cpn:hover {
-    @apply bg-opacity-90 transform scale-105;
+    @apply opacity-90 transform scale-105;
   }
 
   .btn-cpn:active {
@@ -95,7 +95,7 @@
 
   /* Focus states */
   input:focus, textarea:focus, select:focus, button:focus {
-    @apply ring-2 ring-cpn-yellow ring-opacity-50 outline-none;
+    @apply ring-2 ring-cpn-yellow/50 outline-none;
   }
 }
 

@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Implement the /add-girl page with Next.js App Router integration that serves as the first step in the girl profile onboarding flow, integrating the existing ProfileForm component with proper SEO metadata, PWA optimization, and progress indicators. This page will provide a mobile-optimized, native app-like experience for users to start tracking new girl profiles with clear navigation to the next onboarding step.

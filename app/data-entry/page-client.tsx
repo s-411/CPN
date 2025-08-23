@@ -1,0 +1,202 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { OnboardingProvider, useOnboarding } from '@/contexts/onboarding-context'
+import { DataEntryForm } from '@/components/forms/data-entry-form'
+import type { DataEntryData } from '@/lib/utils/session-storage'
+import { useEffect } from 'react'
+import { initializePWA, queueForSync, getPWACapabilities } from '@/lib/utils/pwa'
+
+function DataEntryContent() {
+  const router = useRouter()
+  const { 
+    saveDataEntryData, 
+    goToNextStep, 
+    goToPreviousStep, 
+    progress,
+    data,
+    canNavigateToStep 
+  } = useOnboarding()
+
+  // Check if user can access this step (profile must be completed)
+  useEffect(() => {
+    if (!canNavigateToStep('dataEntry')) {
+      console.log('Redirecting to profile step - prerequisites not met')
+      router.push('/add-girl')
+      return
+    }
+  }, [canNavigateToStep, router])
+
+  const handleDataEntrySubmit = async (data: DataEntryData) => {
+    try {
+      // Save the data entry data to context
+      saveDataEntryData(data)
+      
+      // Navigate to the next step
+      goToNextStep()
+      
+      // Check if offline and queue for background sync if needed
+      const capabilities = getPWACapabilities()
+      if (!capabilities.isOnline && capabilities.supportsBackgroundSync) {
+        await queueForSync(data, 'data-entry-submission')
+        console.log('Data entry queued for background sync (offline)')
+      }
+      
+      // Navigate to CPN result page
+      router.push('/cpn-result')
+    } catch (error) {
+      console.error('Failed to submit data entry:', error)
+      // Error is handled by the DataEntryForm component
+    }
+  }
+
+  const handleBackNavigation = () => {
+    goToPreviousStep()
+    router.back()
+  }
+
+  // Initialize PWA and analytics
+  useEffect(() => {
+    // Initialize PWA functionality
+    initializePWA().catch((error) => {
+      console.error('PWA initialization failed:', error)
+    })
+
+    // Analytics tracking for page view
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'page_view', {
+        page_title: 'Data Entry',
+        page_location: '/data-entry',
+        page_path: '/data-entry',
+        content_group1: 'Onboarding',
+        content_group2: 'Data Collection',
+      })
+    }
+  }, [])
+
+  // Show loading if we can't access this step yet
+  if (!canNavigateToStep('dataEntry')) {
+    return (
+      <main className="min-h-screen bg-cpn-dark text-cpn-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-cpn-yellow border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-cpn-gray">Redirecting to profile setup...</p>
+        </div>
+      </main>
+    )
+  }
+
+  return (
+    <main
+      className="min-h-screen bg-cpn-dark text-cpn-white p-4 sm:p-6 lg:p-8"
+      role="main"
+      aria-labelledby="page-title"
+    >
+      {/* Background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cpn-dark via-cpn-dark to-gray-900 opacity-50" />
+      
+      {/* Page container */}
+      <div className="relative max-w-md mx-auto">
+        {/* Page header */}
+        <header className="text-center mb-8">
+          <div className="mb-4">
+            {/* CPN Logo */}
+            <div className="w-16 h-16 mx-auto mb-4 bg-cpn-yellow rounded-full flex items-center justify-center">
+              <span className="text-2xl font-bold text-cpn-dark">CPN</span>
+            </div>
+            
+            <h1 
+              id="page-title"
+              className="text-3xl font-bold text-cpn-white mb-2 font-national"
+            >
+              Track Your Experience
+            </h1>
+            
+            <p className="text-cpn-gray text-lg leading-relaxed font-klarheit">
+              Enter the details of your dating experience to calculate your 
+              cost per interaction and efficiency metrics.
+            </p>
+          </div>
+
+          {/* Progress indicator */}
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <div className="w-3 h-3 bg-cpn-yellow rounded-full" aria-label="Step 1 completed" />
+            <div className="w-8 h-1 bg-cpn-yellow rounded" />
+            <div className="w-3 h-3 bg-cpn-yellow rounded-full" aria-label="Current step" />
+            <div className="w-8 h-1 bg-cpn-gray rounded" />
+            <div className="w-3 h-3 bg-cpn-gray rounded-full" aria-label="Step 3" />
+          </div>
+
+          <div className="text-sm text-cpn-gray mb-8">
+            Step 2 of 3 • {progress.percentComplete}% Complete
+          </div>
+        </header>
+
+        {/* Data entry form */}
+        <section aria-labelledby="form-section-title" className="mb-8">
+          <h2 id="form-section-title" className="sr-only">
+            Dating Experience Data Entry Form
+          </h2>
+          
+          <DataEntryForm
+            onSubmit={handleDataEntrySubmit}
+            onBack={handleBackNavigation}
+            showBackButton={true}
+            className="animate-fade-in"
+          />
+        </section>
+
+        {/* Help section */}
+        <aside className="text-center" aria-labelledby="help-title">
+          <h3 id="help-title" className="sr-only">Help and Information</h3>
+          
+          <div className="p-4 bg-cpn-dark border border-cpn-gray/20 rounded-lg space-y-2">
+            <p className="text-xs text-cpn-gray mb-2 font-klarheit">
+              🔒 Your data is secure and stored locally
+            </p>
+            <p className="text-xs text-cpn-gray mb-2 font-klarheit">
+              💾 Auto-saved as you type • Never lose your progress
+            </p>
+            <p className="text-xs text-cpn-gray font-klarheit">
+              📊 Used only for your personal CPN calculations
+            </p>
+          </div>
+        </aside>
+
+        {/* Navigation hint for screen readers */}
+        <div className="sr-only" aria-live="polite">
+          Fill out the form above with details about your dating experience.
+          All required fields must be completed to proceed to the results page.
+          Use the back button to return to the previous step if needed.
+        </div>
+      </div>
+
+      {/* Mobile-specific optimizations */}
+      <style jsx>{`
+        @media (max-width: 640px) {
+          main {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+          }
+        }
+      `}</style>
+    </main>
+  )
+}
+
+export default function DataEntryPageClient() {
+  return (
+    <OnboardingProvider initialStep="dataEntry">
+      <DataEntryContent />
+    </OnboardingProvider>
+  )
+}
+
+// Extend Window interface for gtag
+declare global {
+  interface Window {
+    gtag?: (command: string, targetId: string, config?: Record<string, any>) => void
+  }
+}
