@@ -1,4 +1,4 @@
-import { Calculator, Chart, Trophy, Sparkles, Ban, Users, Star, Play } from 'lucide-react';
+import { Calculator, BarChart3, Trophy, Sparkles, Ban, Users, Star, Play } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -151,7 +151,7 @@ export default function HomePage() {
                 text: "CPN tallies everything: dates, drinks, dinners, gifts, rideshares, travel, subscriptions, and time value. Handles currencies and splits automatically."
               },
               {
-                icon: Chart,
+                icon: BarChart3,
                 title: "Visual Analytics",
                 text: "Beautiful dashboards with trend lines, leaderboards, and cost-to-close ratios. Filter by time, location, and girl. Export to CSV."
               },
