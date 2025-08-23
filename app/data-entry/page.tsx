@@ -1,6 +1,4 @@
 import { Metadata } from 'next'
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 import DataEntryPageClient from './page-client'
 
 export const metadata: Metadata = {
@@ -149,12 +147,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function DataEntryPage() {
-  const { userId } = await auth()
-  
-  if (!userId) {
-    redirect('/sign-in?redirect_url=/data-entry')
-  }
+export default function DataEntryPage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',

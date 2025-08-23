@@ -1,15 +1,9 @@
 import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCpnResultsDisplayData } from '@/lib/db/queries';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
+export async function GET() {
   try {
-    // Get the params
-    const { userId } = await params;
-    
     // Authenticate the request
     const { userId: clerkUserId } = await auth();
     
@@ -20,13 +14,11 @@ export async function GET(
       );
     }
 
-    // For now, we'll use the authenticated user's clerkUserId instead of the URL param
-    // In a production app, you'd want to verify the user has permission to access the requested userId
+    // Get CPN data for the authenticated user
     const cpnData = await getCpnResultsDisplayData(clerkUserId);
 
     if (!cpnData || !cpnData.cpnScore) {
-      // Calculate mock CPN score for new users
-      // In production, this would be calculated from actual data
+      // Return mock data for new users
       const mockScore = {
         score: 75,
         categoryScores: {
@@ -36,6 +28,7 @@ export async function GET(
         },
         peerPercentile: 85,
         achievements: [],
+        totalSessions: 3,
         peerComparison: {
           averageScore: 65,
           demographicGroup: 'All Users',
@@ -51,6 +44,7 @@ export async function GET(
       score: cpnData.cpnScore.score,
       categoryScores: cpnData.cpnScore.categoryScores,
       peerPercentile: cpnData.cpnScore.peerPercentile,
+      totalSessions: cpnData.cpnScore.totalSessions || 0,
       achievements: cpnData.achievements.map(ua => ({
         id: ua.achievement.id,
         name: ua.achievement.name,
@@ -61,7 +55,7 @@ export async function GET(
       })),
       peerComparison: {
         averageScore: cpnData.peerComparison.averageScore,
-        demographicGroup: 'All Users', // Could be made dynamic based on user profile
+        demographicGroup: 'All Users',
         totalUsers: cpnData.peerComparison.totalUsers
       }
     };

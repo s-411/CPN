@@ -42,8 +42,8 @@ function DataEntryContent() {
         console.log('Data entry queued for background sync (offline)')
       }
       
-      // Navigate to CPN result page
-      router.push('/cpn-result')
+      // Navigate to sign up page after data entry
+      router.push('/sign-up?redirect_url=/cpn-results')
     } catch (error) {
       console.error('Failed to submit data entry:', error)
       // Error is handled by the DataEntryForm component
@@ -77,8 +77,13 @@ function DataEntryContent() {
   // Show loading if we can't access this step yet
   if (!canNavigateToStep('dataEntry')) {
     return (
-      <main className="min-h-screen bg-cpn-dark text-cpn-white flex items-center justify-center">
+      <main 
+        className="min-h-screen bg-cpn-dark text-cpn-white flex items-center justify-center"
+        role="main"
+        aria-labelledby="loading-title"
+      >
         <div className="text-center">
+          <h1 id="loading-title" className="sr-only">Loading Data Entry</h1>
           <div className="w-8 h-8 border-2 border-cpn-yellow border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-cpn-gray">Redirecting to profile setup...</p>
         </div>

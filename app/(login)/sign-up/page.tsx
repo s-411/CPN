@@ -53,7 +53,7 @@ export default function SignUpPage() {
           }}
           signInUrl="/sign-in"
           routing="hash"
-          afterSignUpUrl="/dashboard"
+          afterSignUpUrl="/cpn-results"
         />
       </div>
     </main>

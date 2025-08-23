@@ -89,10 +89,10 @@ const ScoreDisplay: React.FC<{ score: number; percentile: number }> = ({ score, 
   }, [controls]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-500';
-    if (score >= 80) return 'text-yellow-500';
-    if (score >= 70) return 'text-orange-500';
-    return 'text-red-500';
+    if (score >= 90) return 'text-cpn-yellow';
+    if (score >= 80) return 'text-green-500';
+    if (score >= 70) return 'text-blue-500';
+    return 'text-orange-500';
   };
 
   return (
@@ -108,13 +108,13 @@ const ScoreDisplay: React.FC<{ score: number; percentile: number }> = ({ score, 
         {score}
       </motion.h1>
       <motion.p 
-        className="text-lg text-gray-600 mb-2"
+        className="text-lg text-cpn-gray mb-2"
         variants={itemVariants}
       >
         CPN Score
       </motion.p>
       <motion.div 
-        className="flex items-center justify-center space-x-2 text-sm text-gray-500"
+        className="flex items-center justify-center space-x-2 text-sm text-cpn-gray"
         variants={itemVariants}
       >
         <TrendingUp size={16} />
@@ -137,14 +137,14 @@ const CategoryScoreBar: React.FC<{
       transition={{ delay }}
     >
       <div className="flex justify-between mb-2">
-        <span className="text-sm font-medium text-gray-700 capitalize">
+        <span className="text-sm font-medium text-cpn-gray capitalize">
           {label.replace('_', ' ')}
         </span>
-        <span className="text-sm font-semibold text-gray-900">{score}</span>
+        <span className="text-sm font-semibold text-cpn-white">{score}</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-3">
+      <div className="w-full bg-cpn-gray/20 rounded-full h-3">
         <motion.div
-          className="bg-blue-500 h-3 rounded-full"
+          className="bg-cpn-yellow h-3 rounded-full"
           initial={{ width: 0 }}
           animate={{ width: `${score}%` }}
           transition={{ 
@@ -187,9 +187,9 @@ const AchievementBadge: React.FC<{
       />
       
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-cpn-dark text-cpn-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 border border-cpn-gray/20">
         {achievement.name}
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-cpn-dark"></div>
       </div>
     </motion.button>
   );
@@ -208,31 +208,31 @@ const PeerComparison: React.FC<{
   return (
     <motion.div
       variants={itemVariants}
-      className="bg-gray-50 rounded-lg p-4"
+      className="bg-cpn-dark border border-cpn-gray/20 rounded-lg p-4"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
-          <Users size={20} className="text-gray-600" />
-          <span className="font-medium text-gray-900">Peer Comparison</span>
+          <Users size={20} className="text-cpn-yellow" />
+          <span className="font-medium text-cpn-white">Peer Comparison</span>
         </div>
       </div>
       
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
-          <span className="text-gray-600">Your Score:</span>
-          <span className="font-semibold text-gray-900">{userScore}</span>
+          <span className="text-cpn-gray">Your Score:</span>
+          <span className="font-semibold text-cpn-white">{userScore}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Average ({demographicGroup}):</span>
-          <span className="font-semibold text-gray-900">{averageScore}</span>
+          <span className="text-cpn-gray">Average ({demographicGroup}):</span>
+          <span className="font-semibold text-cpn-white">{averageScore}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Total Users:</span>
-          <span className="font-semibold text-gray-900">{totalUsers.toLocaleString()}</span>
+          <span className="text-cpn-gray">Total Users:</span>
+          <span className="font-semibold text-cpn-white">{totalUsers.toLocaleString()}</span>
         </div>
         
         <motion.div
-          className={`mt-3 p-3 rounded-md ${isAboveAverage ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
+          className={`mt-3 p-3 rounded-md ${isAboveAverage ? 'bg-cpn-yellow/20 text-cpn-yellow' : 'bg-orange-500/20 text-orange-500'}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
@@ -255,7 +255,7 @@ const ShareButton: React.FC<{ onShare: () => void; isSharing: boolean }> = ({ on
     <Button
       onClick={onShare}
       disabled={isSharing}
-      className="w-full min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg shadow-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="w-full min-h-[44px] bg-cpn-yellow hover:bg-cpn-yellow/80 text-cpn-dark font-medium py-3 px-6 rounded-full shadow-lg transition-colors duration-200 focus:ring-2 focus:ring-cpn-yellow focus:ring-offset-2 focus:ring-offset-cpn-dark"
     >
       <div className="flex items-center justify-center space-x-2">
         <Share size={20} />
@@ -333,7 +333,7 @@ export const CpnResultsDisplay: React.FC = () => {
   // Loading state
   if (!isLoaded || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4" data-testid="cpn-loading">
+      <div className="flex items-center justify-center min-h-screen p-4 bg-cpn-dark" data-testid="cpn-loading">
         <LoadingSpinner />
       </div>
     );
@@ -342,10 +342,10 @@ export const CpnResultsDisplay: React.FC = () => {
   // Not signed in
   if (!isSignedIn) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <Card className="max-w-md w-full p-6 text-center">
-          <h2 className="text-xl font-semibold mb-2">Sign In Required</h2>
-          <p className="text-gray-600">Please sign in to view your CPN results.</p>
+      <div className="flex items-center justify-center min-h-screen p-4 bg-cpn-dark">
+        <Card className="max-w-md w-full p-6 text-center bg-cpn-dark border-cpn-gray/20">
+          <h2 className="text-xl font-semibold mb-2 text-cpn-white">Sign In Required</h2>
+          <p className="text-cpn-gray">Please sign in to view your CPN results.</p>
         </Card>
       </div>
     );
@@ -354,11 +354,11 @@ export const CpnResultsDisplay: React.FC = () => {
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <Card className="max-w-md w-full p-6 text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Error Loading Results</h2>
-          <p className="text-gray-600 mb-4">{error.message}</p>
-          <Button onClick={() => mutate()} className="w-full">
+      <div className="flex items-center justify-center min-h-screen p-4 bg-cpn-dark">
+        <Card className="max-w-md w-full p-6 text-center bg-cpn-dark border-cpn-gray/20">
+          <h2 className="text-xl font-semibold text-red-500 mb-2">Error Loading Results</h2>
+          <p className="text-cpn-gray mb-4">{error.message}</p>
+          <Button onClick={() => mutate()} className="w-full bg-cpn-yellow text-cpn-dark hover:bg-cpn-yellow/80 rounded-full">
             Try Again
           </Button>
         </Card>
@@ -369,12 +369,12 @@ export const CpnResultsDisplay: React.FC = () => {
   // No data state
   if (!data) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <Card className="max-w-md w-full p-6 text-center">
-          <h2 className="text-xl font-semibold mb-2">No CPN Score Found</h2>
-          <p className="text-gray-600 mb-4">Complete your CPN assessment to see your results.</p>
-          <Button onClick={() => window.location.href = '/assessment'} className="w-full">
-            Take Assessment
+      <div className="flex items-center justify-center min-h-screen p-4 bg-cpn-dark">
+        <Card className="max-w-md w-full p-6 text-center bg-cpn-dark border-cpn-gray/20">
+          <h2 className="text-xl font-semibold mb-2 text-cpn-white">No CPN Score Found</h2>
+          <p className="text-cpn-gray mb-4">Complete your CPN assessment to see your results.</p>
+          <Button onClick={() => window.location.href = '/add-girl'} className="w-full bg-cpn-yellow text-cpn-dark hover:bg-cpn-yellow/80 rounded-full">
+            Start Assessment
           </Button>
         </Card>
       </div>
@@ -382,7 +382,7 @@ export const CpnResultsDisplay: React.FC = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <main className="min-h-screen bg-cpn-dark p-4">
       <motion.div
         className="max-w-md mx-auto space-y-6"
         variants={containerVariants}
@@ -394,20 +394,20 @@ export const CpnResultsDisplay: React.FC = () => {
           variants={itemVariants}
           className="text-center"
         >
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Your CPN Results</h1>
-          <p className="text-gray-600">Here's how you performed</p>
+          <h1 className="text-2xl font-bold text-cpn-white mb-2">Your CPN Results</h1>
+          <p className="text-cpn-gray">Here's how you performed</p>
         </motion.div>
 
         {/* Main Score Display */}
-        <Card className="p-6">
+        <Card className="p-6 bg-cpn-dark border-cpn-gray/20">
           <ScoreDisplay score={data.score} percentile={data.peerPercentile} />
         </Card>
 
         {/* Category Scores */}
-        <Card className="p-6">
+        <Card className="p-6 bg-cpn-dark border-cpn-gray/20">
           <motion.h2
             variants={itemVariants}
-            className="text-lg font-semibold text-gray-900 mb-4"
+            className="text-lg font-semibold text-cpn-white mb-4"
           >
             Category Breakdown
           </motion.h2>
@@ -426,10 +426,10 @@ export const CpnResultsDisplay: React.FC = () => {
 
         {/* Achievements */}
         {data.achievements.length > 0 && (
-          <Card className="p-6">
+          <Card className="p-6 bg-cpn-dark border-cpn-gray/20">
             <motion.h2
               variants={itemVariants}
-              className="text-lg font-semibold text-gray-900 mb-4"
+              className="text-lg font-semibold text-cpn-white mb-4"
             >
               Achievements Unlocked
             </motion.h2>
@@ -451,10 +451,10 @@ export const CpnResultsDisplay: React.FC = () => {
         )}
 
         {/* Peer Comparison */}
-        <Card className="p-6">
+        <Card className="p-6 bg-cpn-dark border-cpn-gray/20">
           <motion.h2
             variants={itemVariants}
-            className="text-lg font-semibold text-gray-900 mb-4"
+            className="text-lg font-semibold text-cpn-white mb-4"
           >
             How You Compare
           </motion.h2>
@@ -480,7 +480,7 @@ export const CpnResultsDisplay: React.FC = () => {
           <Button
             variant="outline"
             onClick={() => window.location.href = '/dashboard'}
-            className="w-full min-h-[44px]"
+            className="w-full min-h-[44px] border-cpn-gray/20 text-cpn-white hover:bg-cpn-gray/10 rounded-full"
           >
             Continue to Dashboard
           </Button>
@@ -491,14 +491,14 @@ export const CpnResultsDisplay: React.FC = () => {
       <AnimatePresence>
         {selectedAchievement && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedAchievement(null)}
           >
             <motion.div
-              className="bg-white rounded-lg p-6 max-w-sm w-full"
+              className="bg-cpn-dark border border-cpn-gray/20 rounded-lg p-6 max-w-sm w-full"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -512,21 +512,21 @@ export const CpnResultsDisplay: React.FC = () => {
                   <Trophy size={24} />
                 </div>
                 
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-cpn-white mb-2">
                   {selectedAchievement.name}
                 </h3>
                 
-                <p className="text-gray-600 mb-4">
+                <p className="text-cpn-gray mb-4">
                   {selectedAchievement.description}
                 </p>
                 
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-cpn-gray/70 mb-4">
                   Earned: {new Date(selectedAchievement.earnedAt).toLocaleDateString()}
                 </p>
                 
                 <Button
                   onClick={() => setSelectedAchievement(null)}
-                  className="w-full"
+                  className="w-full bg-cpn-yellow text-cpn-dark hover:bg-cpn-yellow/80 rounded-full"
                 >
                   Close
                 </Button>

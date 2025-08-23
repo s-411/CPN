@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 import { AddGirlPageClient } from './page-client'
 
 export const metadata: Metadata = {
@@ -102,13 +100,7 @@ const jsonLd = {
   },
 }
 
-export default async function AddGirlPage() {
-  const { userId } = await auth()
-  
-  if (!userId) {
-    redirect('/sign-in?redirect_url=/add-girl')
-  }
-
+export default function AddGirlPage() {
   return (
     <>
       <script

@@ -1,287 +1,184 @@
 'use client';
 
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter
-} from '@/components/ui/card';
-import { customerPortalAction } from '@/lib/payments/actions';
-import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
+import { Trophy, TrendingUp, Users, Target, Calculator, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 import useSWR from 'swr';
 import { Suspense } from 'react';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Loader2, PlusCircle } from 'lucide-react';
-
-type ActionState = {
-  error?: string;
-  success?: string;
-};
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function SubscriptionSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
+function DashboardStats() {
+  const { data: cpnData } = useSWR('/api/cpn/results/me', fetcher);
+  
+  const stats = [
+    {
+      title: 'CPN Score',
+      value: cpnData?.score || '--',
+      icon: Trophy,
+      color: 'text-cpn-yellow',
+      bgColor: 'bg-cpn-yellow/10'
+    },
+    {
+      title: 'Peer Percentile',
+      value: cpnData?.peerPercentile ? `${cpnData.peerPercentile}%` : '--',
+      icon: TrendingUp,
+      color: 'text-green-500',
+      bgColor: 'bg-green-500/10'
+    },
+    {
+      title: 'Achievements',
+      value: cpnData?.achievements?.length || 0,
+      icon: Target,
+      color: 'text-blue-500',
+      bgColor: 'bg-blue-500/10'
+    },
+    {
+      title: 'Total Sessions',
+      value: cpnData?.totalSessions || 0,
+      icon: Calculator,
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-500/10'
+    }
+  ];
 
-function ManageSubscription() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
-
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="mb-4 sm:mb-0">
-              <p className="font-medium">
-                Current Plan: {teamData?.planName || 'Free'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {teamData?.subscriptionStatus === 'active'
-                  ? 'Billed monthly'
-                  : teamData?.subscriptionStatus === 'trialing'
-                  ? 'Trial period'
-                  : 'No active subscription'}
-              </p>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {stats.map((stat) => (
+        <Card key={stat.title} className="bg-cpn-dark border-cpn-gray/20 hover:border-cpn-yellow/50 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-cpn-gray">
+              {stat.title}
+            </CardTitle>
+            <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+              <stat.icon className={`h-4 w-4 ${stat.color}`} />
             </div>
-            <form action={customerPortalAction}>
-              <Button type="submit" variant="outline">
-                Manage Subscription
-              </Button>
-            </form>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-cpn-white">{stat.value}</div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }
 
-function TeamMembersSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Members</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="animate-pulse space-y-4 mt-1">
-          <div className="flex items-center space-x-4">
-            <div className="size-8 rounded-full bg-gray-200"></div>
-            <div className="space-y-2">
-              <div className="h-4 w-32 bg-gray-200 rounded"></div>
-              <div className="h-3 w-14 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TeamMembers() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
-  const [removeState, removeAction, isRemovePending] = useActionState<
-    ActionState,
-    FormData
-  >(removeTeamMember, {});
-
-  const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
-    return user.name || user.email || 'Unknown User';
-  };
-
-  if (!teamData?.teamMembers?.length) {
-    return (
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Team Members</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">No team members yet.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+function QuickActions() {
+  const actions = [
+    {
+      title: 'Start New Session',
+      description: 'Track a new encounter',
+      href: '/add-girl',
+      icon: Calculator,
+      color: 'bg-cpn-yellow text-cpn-dark hover:bg-cpn-yellow/80'
+    },
+    {
+      title: 'View CPN Results',
+      description: 'See your detailed analytics',
+      href: '/cpn-results',
+      icon: Trophy,
+      color: 'bg-transparent border-2 border-cpn-yellow text-cpn-yellow hover:bg-cpn-yellow hover:text-cpn-dark'
+    }
+  ];
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Members</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-4">
-          {teamData.teamMembers.map((member, index) => (
-            <li key={member.id} className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Avatar>
-                  {/* 
-                    This app doesn't save profile images, but here
-                    is how you'd show them:
-
-                    <AvatarImage
-                      src={member.user.image || ''}
-                      alt={getUserDisplayName(member.user)}
-                    />
-                  */}
-                  <AvatarFallback>
-                    {getUserDisplayName(member.user)
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </AvatarFallback>
-                </Avatar>
+    <div className="grid gap-4 md:grid-cols-2">
+      {actions.map((action) => (
+        <Link key={action.title} href={action.href}>
+          <Card className="bg-cpn-dark border-cpn-gray/20 hover:border-cpn-yellow/50 transition-all cursor-pointer group">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">
-                    {getUserDisplayName(member.user)}
-                  </p>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {member.role}
-                  </p>
+                  <CardTitle className="text-lg text-cpn-white group-hover:text-cpn-yellow transition-colors">
+                    {action.title}
+                  </CardTitle>
+                  <p className="text-sm text-cpn-gray mt-1">{action.description}</p>
                 </div>
+                <ArrowRight className="h-5 w-5 text-cpn-gray group-hover:text-cpn-yellow transition-colors" />
               </div>
-              {index > 1 ? (
-                <form action={removeAction}>
-                  <input type="hidden" name="memberId" value={member.id} />
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    size="sm"
-                    disabled={isRemovePending}
-                  >
-                    {isRemovePending ? 'Removing...' : 'Remove'}
-                  </Button>
-                </form>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-        {removeState?.error && (
-          <p className="text-red-500 mt-4">{removeState.error}</p>
-        )}
-      </CardContent>
-    </Card>
+            </CardHeader>
+          </Card>
+        </Link>
+      ))}
+    </div>
   );
 }
 
-function InviteTeamMemberSkeleton() {
-  return (
-    <Card className="h-[260px]">
-      <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
-
-function InviteTeamMember() {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
-  const isOwner = user?.role === 'owner';
-  const [inviteState, inviteAction, isInvitePending] = useActionState<
-    ActionState,
-    FormData
-  >(inviteTeamMember, {});
+function RecentActivity() {
+  // This would fetch recent activity data
+  const activities = [
+    { date: '2024-01-20', type: 'Session Completed', score: 82 },
+    { date: '2024-01-19', type: 'Achievement Unlocked', achievement: 'First Timer' },
+    { date: '2024-01-18', type: 'Session Completed', score: 75 }
+  ];
 
   return (
-    <Card>
+    <Card className="bg-cpn-dark border-cpn-gray/20">
       <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+        <CardTitle className="text-cpn-white">Recent Activity</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={inviteAction} className="space-y-4">
-          <div>
-            <Label htmlFor="email" className="mb-2">
-              Email
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter email"
-              required
-              disabled={!isOwner}
-            />
-          </div>
-          <div>
-            <Label>Role</Label>
-            <RadioGroup
-              defaultValue="member"
-              name="role"
-              className="flex space-x-4"
-              disabled={!isOwner}
-            >
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
+        <div className="space-y-3">
+          {activities.map((activity, index) => (
+            <div key={index} className="flex items-center justify-between py-2 border-b border-cpn-gray/10 last:border-0">
+              <div>
+                <p className="text-sm text-cpn-white">{activity.type}</p>
+                <p className="text-xs text-cpn-gray">{activity.date}</p>
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner">Owner</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          {inviteState?.error && (
-            <p className="text-red-500">{inviteState.error}</p>
-          )}
-          {inviteState?.success && (
-            <p className="text-green-500">{inviteState.success}</p>
-          )}
-          <Button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={isInvitePending || !isOwner}
-          >
-            {isInvitePending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Inviting...
-              </>
-            ) : (
-              <>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Invite Member
-              </>
-            )}
-          </Button>
-        </form>
+              {activity.score && (
+                <span className="text-cpn-yellow font-bold">{activity.score}</span>
+              )}
+              {activity.achievement && (
+                <span className="text-xs bg-cpn-yellow/20 text-cpn-yellow px-2 py-1 rounded">
+                  {activity.achievement}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
       </CardContent>
-      {!isOwner && (
-        <CardFooter>
-          <p className="text-sm text-muted-foreground">
-            You must be a team owner to invite new members.
-          </p>
-        </CardFooter>
-      )}
     </Card>
   );
 }
 
-export default function SettingsPage() {
+export default function DashboardPage() {
+  const { fullName, email } = useAuth();
+  const displayName = fullName || email?.split('@')[0] || 'User';
+
   return (
-    <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
-      <Suspense fallback={<SubscriptionSkeleton />}>
-        <ManageSubscription />
+    <div className="flex-1 space-y-6 p-4 md:p-6 lg:p-8">
+      <div>
+        <h1 className="text-3xl font-bold text-cpn-white">
+          Welcome back, {displayName}
+        </h1>
+        <p className="text-cpn-gray mt-1">
+          Track your performance and improve your CPN score
+        </p>
+      </div>
+
+      <Suspense fallback={
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="bg-cpn-dark border-cpn-gray/20 h-24 animate-pulse" />
+          ))}
+        </div>
+      }>
+        <DashboardStats />
       </Suspense>
-      <Suspense fallback={<TeamMembersSkeleton />}>
-        <TeamMembers />
-      </Suspense>
-      <Suspense fallback={<InviteTeamMemberSkeleton />}>
-        <InviteTeamMember />
-      </Suspense>
-    </section>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold text-cpn-white">Quick Actions</h2>
+          <QuickActions />
+        </div>
+        
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold text-cpn-white">Activity</h2>
+          <RecentActivity />
+        </div>
+      </div>
+    </div>
   );
 }

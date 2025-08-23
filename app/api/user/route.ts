@@ -15,7 +15,18 @@ export async function GET() {
     const user = await getUserByClerkId(userId);
     
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      // For now, return a mock user for new Clerk users
+      // In production, this would be handled by a Clerk webhook on user creation
+      const mockUser = {
+        id: 1,
+        clerkId: userId,
+        name: 'New User',
+        email: 'user@example.com',
+        role: 'member',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      return NextResponse.json(mockUser);
     }
 
     return NextResponse.json(user);
