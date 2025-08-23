@@ -10,11 +10,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // CPN Brand Colors (direct values)
-        'cpn-yellow': 'var(--cpn-yellow)',
-        'cpn-dark': 'var(--cpn-dark)',
-        'cpn-white': 'var(--cpn-white)',
-        'cpn-gray': 'var(--cpn-gray)',
+        // CPN Brand Colors with opacity support
+        'cpn-yellow': 'rgb(242 246 97 / <alpha-value>)',
+        'cpn-dark': 'rgb(31 31 31 / <alpha-value>)',
+        'cpn-white': 'rgb(255 255 255 / <alpha-value>)',
+        'cpn-gray': 'rgb(171 171 171 / <alpha-value>)',
         
         // Semantic colors using CSS variables
         background: 'var(--background)',
