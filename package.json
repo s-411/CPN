@@ -17,7 +17,9 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.31.4",
     "@hookform/resolvers": "^5.2.1",
+    "@supabase/supabase-js": "^2.56.0",
     "@tailwindcss/postcss": "4.1.7",
     "@types/node": "^22.15.18",
     "@types/react": "19.1.4",
@@ -29,6 +31,8 @@
     "dotenv": "^16.5.0",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.1",
+    "framer-motion": "^12.23.12",
+    "html2canvas": "^1.4.1",
     "jose": "^6.0.11",
     "lucide-react": "^0.511.0",
     "next": "15.3.0",
@@ -40,6 +44,7 @@
     "react-hook-form": "^7.62.0",
     "server-only": "^0.0.1",
     "stripe": "^18.1.0",
+    "svix": "^1.74.1",
     "swr": "^2.3.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "4.1.7",

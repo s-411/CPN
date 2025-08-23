@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Create a mobile-first CPN result display page that shows users their calculated CPN score within the onboarding flow, featuring gamified elements, achievement badges, and viral sharing capabilities. The page serves as a key conversion point with animated score reveals, peer comparisons, and optimized social sharing that generates graphics with embedded referral codes to drive viral growth.

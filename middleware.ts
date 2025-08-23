@@ -1,27 +1,27 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  
-  // Skip middleware for static files, API routes, and test pages
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('-test') ||
-    pathname.includes('favicon') ||
-    pathname.startsWith('/manifest') ||
-    pathname.startsWith('/sw.js') ||
-    pathname.startsWith('/icons')
-  ) {
-    return NextResponse.next()
+const isProtectedRoute = createRouteMatcher([
+  '/add-girl(.*)',
+  '/data-entry(.*)', 
+  '/cpn-result(.*)',
+  '/dashboard(.*)',
+  '/profile(.*)'
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) {
+    const authResult = await auth();
+    if (!authResult.userId) {
+      return authResult.redirectToSignIn();
+    }
   }
-
-  // For now, just pass through all other requests
-  // TODO: Add authentication logic when needed
-  return NextResponse.next()
-}
+});
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-}
+  matcher: [
+    // Skip Next.js internals and all static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+};

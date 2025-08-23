@@ -73,6 +73,15 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   const { user: foundUser, team: foundTeam } = userWithTeam[0];
 
+  // Check if user has a password hash (for non-Clerk users)
+  if (!foundUser.passwordHash) {
+    return {
+      error: 'Please sign in using your authentication provider.',
+      email,
+      password
+    };
+  }
+
   const isPasswordValid = await comparePasswords(
     password,
     foundUser.passwordHash
@@ -239,6 +248,16 @@ export const updatePassword = validatedActionWithUser(
   async (data, _, user) => {
     const { currentPassword, newPassword, confirmPassword } = data;
 
+    // Check if user has a password hash (for non-Clerk users)
+    if (!user.passwordHash) {
+      return {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+        error: 'Password update not available for users signed in with authentication providers.'
+      };
+    }
+
     const isPasswordValid = await comparePasswords(
       currentPassword,
       user.passwordHash
@@ -296,6 +315,14 @@ export const deleteAccount = validatedActionWithUser(
   deleteAccountSchema,
   async (data, _, user) => {
     const { password } = data;
+
+    // Check if user has a password hash (for non-Clerk users)
+    if (!user.passwordHash) {
+      return {
+        password,
+        error: 'Account deletion not available for users signed in with authentication providers.'
+      };
+    }
 
     const isPasswordValid = await comparePasswords(password, user.passwordHash);
     if (!isPasswordValid) {
