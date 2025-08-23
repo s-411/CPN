@@ -16,9 +16,6 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "postinstall": "echo 'Dependencies installed successfully'",
-    "heroku-postbuild": "pnpm install --force && pnpm build",
-    "prebuild": "rm -f package-lock.json yarn.lock npm-shrinkwrap.json"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
