@@ -91,7 +91,7 @@ const ScoreDisplay: React.FC<{ score: number; percentile: number }> = ({ score, 
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'text-cpn-yellow';
     if (score >= 80) return 'text-green-500';
-    if (score >= 70) return 'text-blue-500';
+    if (score >= 70) return 'text-cpn-gray';
     return 'text-orange-500';
   };
 

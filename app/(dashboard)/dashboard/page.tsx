@@ -32,8 +32,8 @@ function DashboardStats() {
       title: 'Achievements',
       value: cpnData?.achievements?.length || 0,
       icon: Target,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-500/10'
+      color: 'text-cpn-yellow',
+      bgColor: 'bg-cpn-yellow/10'
     },
     {
       title: 'Total Sessions',

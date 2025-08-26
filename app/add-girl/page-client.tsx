@@ -4,12 +4,18 @@ import { useRouter } from 'next/navigation'
 import { OnboardingProvider, useOnboarding } from '@/contexts/onboarding-context'
 import { ProfileForm } from '@/components/forms/profile-form'
 import type { ProfileFormData } from '@/types/profile'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { initializePWA, queueForSync, getPWACapabilities } from '@/lib/utils/pwa'
 
 function AddGirlContent() {
   const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
   const { saveProfileData, goToNextStep, progress } = useOnboarding()
+
+  // Set client-side flag
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleProfileSubmit = async (data: ProfileFormData) => {
     try {
@@ -55,7 +61,7 @@ function AddGirlContent() {
 
   return (
     <main
-      className="min-h-screen bg-cpn-dark text-cpn-white p-4 sm:p-6 lg:p-8"
+      className="min-h-screen bg-cpn-dark text-cpn-white p-4 sm:p-6 lg:p-8 pt-safe-top pb-safe-bottom pl-safe-left pr-safe-right sm:pt-4 sm:pb-6 sm:pl-6 sm:pr-6"
       role="main"
       aria-labelledby="page-title"
     >
@@ -65,7 +71,7 @@ function AddGirlContent() {
       {/* Page container */}
       <div className="relative max-w-md mx-auto">
         {/* Page header */}
-        <header className="text-center mb-0">
+        <header className="text-center mb-8">
           <div className="mb-4">
             {/* CPN Logo */}
             <div className="w-16 h-16 mx-auto mb-4 bg-cpn-yellow rounded-full flex items-center justify-center">
@@ -93,8 +99,8 @@ function AddGirlContent() {
             <div className="w-3 h-3 bg-cpn-gray rounded-full" aria-label="Step 3" />
           </div>
 
-          <div className="text-sm text-cpn-gray mb-0">
-            Step {progress.currentStep === 'profile' ? 1 : 2} of 3
+          <div className="text-sm text-cpn-gray mb-8">
+            Step {isClient ? (progress.currentStep === 'profile' ? 1 : 2) : 1} of 3
           </div>
         </header>
 
@@ -132,17 +138,6 @@ function AddGirlContent() {
         </div>
       </div>
 
-      {/* Mobile-specific optimizations */}
-      <style jsx>{`
-        @media (max-width: 640px) {
-          main {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-          }
-        }
-      `}</style>
     </main>
   )
 }

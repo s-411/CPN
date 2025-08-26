@@ -36,9 +36,55 @@ export async function getUser() {
       return null;
     }
 
-    return await getUserByClerkId(userId);
+    // First try to get existing user
+    let user = await getUserByClerkId(userId);
+    
+    // If user doesn't exist, create them
+    if (!user) {
+      user = await createUserFromClerk(userId);
+    }
+
+    return user;
   } catch (error) {
     console.error('Error in getUser:', error);
+    return null;
+  }
+}
+
+// Create a user from Clerk ID if they don't exist
+async function createUserFromClerk(clerkId: string) {
+  try {
+    // Import current user to get details from Clerk
+    const { currentUser } = await import('@clerk/nextjs/server');
+    const clerkUser = await currentUser();
+    
+    if (!clerkUser) {
+      throw new Error('Clerk user not found');
+    }
+
+    // Create user in database
+    const [newUser] = await db.insert(users).values({
+      clerkId: clerkId,
+      name: clerkUser.fullName || clerkUser.firstName || 'User',
+      email: clerkUser.primaryEmailAddress?.emailAddress || ''
+    }).returning();
+
+    // Create a team for the user
+    const [newTeam] = await db.insert(teams).values({
+      name: `${newUser.name}'s Team`,
+      planName: 'free'
+    }).returning();
+
+    // Add user to their team
+    await db.insert(teamMembers).values({
+      userId: newUser.id,
+      teamId: newTeam.id,
+      role: 'owner'
+    });
+
+    return newUser;
+  } catch (error) {
+    console.error('Error creating user from Clerk:', error);
     return null;
   }
 }

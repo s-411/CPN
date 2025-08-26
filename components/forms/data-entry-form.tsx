@@ -10,8 +10,7 @@ import {
   COST_SUGGESTIONS,
   validateCurrency,
   validateTime,
-  formatCurrency,
-  formatTime
+  formatCurrency
 } from '@/lib/validations/data-entry'
 import type { DataEntryFormData } from '@/lib/validations/data-entry'
 import type { DataEntryData } from '@/lib/utils/session-storage'
@@ -39,18 +38,18 @@ export function DataEntryForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [costInput, setCostInput] = useState('')
   const [timeInput, setTimeInput] = useState('')
-  const [dateInput, setDateInput] = useState('')
   
   const {
     control,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isDirty, isValid }
+    trigger,
+    formState: { errors, isDirty, isValid, isSubmitted }
   } = useForm<DataEntryFormData>({
     resolver: zodResolver(dataEntrySchema),
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       date: '',
       cost: 0,
@@ -72,11 +71,6 @@ export function DataEntryForm({
       // Set display inputs
       setCostInput(existingData.cost ? formatCurrency(existingData.cost) : '')
       setTimeInput(existingData.time ? existingData.time.toString() : '1')
-      if (existingData.date) {
-        // Convert YYYY-MM-DD to MM/DD/YYYY for display
-        const [year, month, day] = existingData.date.split('-')
-        setDateInput(`${month}/${day}/${year}`)
-      }
     }
   }, [existingData, contextLoading, setValue])
 
@@ -130,7 +124,7 @@ export function DataEntryForm({
     setCostInput(value)
     const parsedCost = validateCurrency(value)
     if (parsedCost !== null) {
-      setValue('cost', parsedCost, { shouldDirty: true })
+      setValue('cost', parsedCost, { shouldDirty: true, shouldValidate: true })
     }
   }
 
@@ -138,59 +132,34 @@ export function DataEntryForm({
     setTimeInput(value)
     const parsedTime = validateTime(value)
     if (parsedTime !== null) {
-      setValue('time', parsedTime, { shouldDirty: true })
+      setValue('time', parsedTime, { shouldDirty: true, shouldValidate: true })
     }
   }
 
   const handleCostSuggestion = (cost: number) => {
     setCostInput(formatCurrency(cost))
-    setValue('cost', cost, { shouldDirty: true })
+    setValue('cost', cost, { shouldDirty: true, shouldValidate: true })
   }
 
   const handleTimeSuggestion = (time: number) => {
     setTimeInput(time.toString())
-    setValue('time', time, { shouldDirty: true })
+    setValue('time', time, { shouldDirty: true, shouldValidate: true })
   }
 
-  const handleDateChange = (value: string) => {
-    setDateInput(value)
-    
-    // Allow various formats while typing
-    const cleaned = value.replace(/\D/g, '')
-    
-    // Auto-format as user types
-    let formatted = ''
-    if (cleaned.length >= 2) {
-      formatted = cleaned.slice(0, 2) + '/'
-      if (cleaned.length >= 4) {
-        formatted += cleaned.slice(2, 4) + '/'
-        if (cleaned.length >= 4) {
-          formatted += cleaned.slice(4, 8)
-        }
-      } else if (cleaned.length > 2) {
-        formatted += cleaned.slice(2)
-      }
-    } else {
-      formatted = cleaned
-    }
-    
-    // Update display if auto-formatting
-    if (value !== formatted && cleaned.length > 0) {
-      setDateInput(formatted)
-    }
-    
-    // Validate and set the actual date value in YYYY-MM-DD format
-    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/
-    const match = (formatted || value).match(dateRegex)
-    if (match) {
-      const [, month, day, year] = match
-      const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      setValue('date', isoDate, { shouldDirty: true })
-    }
-  }
 
   const isFormDisabled = isLoading || isSubmitting || contextLoading
   const today = new Date().toISOString().split('T')[0]
+
+  // Debug form state
+  const watchedValues = watch()
+  useEffect(() => {
+    console.log('Form state:', { 
+      isValid, 
+      errors: Object.keys(errors), 
+      values: watchedValues,
+      isDirty
+    })
+  }, [isValid, errors, watchedValues, isDirty])
 
   return (
     <div className={`w-full max-w-md mx-auto ${className}`}>
@@ -210,32 +179,58 @@ export function DataEntryForm({
           control={control}
           render={({ field }) => (
             <FormField
-              label="What date was it?"
+              label="What date was it? (roughly)"
               required
               error={errors.date?.message}
               className="space-y-2"
             >
-              <input
-                type="text"
-                placeholder="MM/DD/YYYY"
-                value={dateInput}
-                onChange={(e) => handleDateChange(e.target.value)}
-                maxLength={10}
-                disabled={isFormDisabled}
-                className={`
-                  w-full min-h-[44px] p-3 rounded-lg border transition-all duration-200
-                  bg-cpn-dark text-cpn-white placeholder-cpn-gray
-                  focus:ring-2 focus:ring-cpn-yellow focus:border-cpn-yellow outline-none
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  ${errors.date 
-                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
-                    : 'border-cpn-gray hover:border-cpn-white'
-                  }
-                `}
-                aria-describedby={errors.date ? 'date-error' : undefined}
-              />
-              <p className="text-xs text-cpn-gray">
-                Enter the date in MM/DD/YYYY format
+              <div className="relative">
+                <input
+                  type="date"
+                  value={field.value}
+                  onChange={(e) => {
+                    field.onChange(e.target.value)
+                  }}
+                  max={today}
+                  disabled={isFormDisabled}
+                  lang="en-US"
+                  data-date-format="mm/dd/yyyy"
+                  className={`
+                    w-full min-h-[44px] p-3 pr-12 rounded-lg border transition-all duration-200
+                    bg-cpn-dark text-cpn-white placeholder-cpn-gray
+                    focus:ring-2 focus:ring-cpn-yellow focus:border-cpn-yellow outline-none
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    [&::-webkit-calendar-picker-indicator]:opacity-0
+                    [&::-webkit-calendar-picker-indicator]:absolute
+                    [&::-webkit-calendar-picker-indicator]:right-3
+                    [&::-webkit-calendar-picker-indicator]:w-6
+                    [&::-webkit-calendar-picker-indicator]:h-6
+                    [&::-webkit-calendar-picker-indicator]:cursor-pointer
+                    ${errors.date 
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500 ring-2 ring-red-500/50' 
+                      : 'border-cpn-gray hover:border-cpn-white'
+                    }
+                  `}
+                  aria-describedby={errors.date ? 'date-error' : 'date-help'}
+                />
+                {/* Custom calendar icon */}
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    className={`${errors.date ? 'text-red-500' : 'text-cpn-yellow'}`}
+                  >
+                    <path 
+                      d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" 
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p id="date-help" className="text-xs text-cpn-gray">
+                Tap to open date picker
               </p>
             </FormField>
           )}
@@ -261,7 +256,7 @@ export function DataEntryForm({
                 focus:ring-2 focus:ring-cpn-yellow focus:border-cpn-yellow outline-none
                 disabled:opacity-50 disabled:cursor-not-allowed
                 ${errors.cost 
-                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500 ring-2 ring-red-500/50' 
                   : 'border-cpn-gray hover:border-cpn-white'
                 }
               `}
@@ -314,7 +309,7 @@ export function DataEntryForm({
                   focus:ring-2 focus:ring-cpn-yellow focus:border-cpn-yellow outline-none
                   disabled:opacity-50 disabled:cursor-not-allowed
                   ${errors.time 
-                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500 ring-2 ring-red-500/50' 
                     : 'border-cpn-gray hover:border-cpn-white'
                   }
                 `}
@@ -421,12 +416,23 @@ export function DataEntryForm({
         <div className="space-y-4 pt-4">
           <button
             type="submit"
-            disabled={isFormDisabled || !isValid}
+            disabled={isFormDisabled}
+            onClick={async () => {
+              // Trigger validation on all fields when button is clicked
+              console.log('Submit clicked, current form state:', { isValid, errors, values: watchedValues })
+              if (!isValid) {
+                const result = await trigger()
+                console.log('Manual validation result:', result)
+                // Force validation on all fields to show errors
+                Object.keys(errors).forEach(field => {
+                  console.log(`Field ${field} has error:`, errors[field as keyof typeof errors]?.message)
+                })
+              }
+            }}
             className={`
               btn-cpn w-full min-h-[44px] flex items-center justify-center space-x-2
               disabled:opacity-50 disabled:cursor-not-allowed
               focus:ring-2 focus:ring-cpn-yellow focus:ring-offset-2 focus:ring-offset-cpn-dark focus:outline-none
-              ${!isValid ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
             {isSubmitting || isLoading ? (
@@ -434,10 +440,25 @@ export function DataEntryForm({
                 <LoadingSpinner size="sm" />
                 <span>Calculating...</span>
               </>
+            ) : !isValid ? (
+              <span>Please complete all fields</span>
             ) : (
               <span>Calculate CPN</span>
             )}
           </button>
+          
+          {/* Error summary */}
+          {!isValid && Object.keys(errors).length > 0 && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+              <p className="text-red-400 text-sm font-medium mb-2">Please complete the following:</p>
+              <ul className="text-red-400 text-xs space-y-1">
+                {errors.date && <li>• Select a date</li>}
+                {errors.cost && <li>• Enter the total amount spent</li>}
+                {errors.time && <li>• Enter the time invested</li>}
+                {errors.nuts && <li>• Select the number of nuts</li>}
+              </ul>
+            </div>
+          )}
           
           {showBackButton && (
             <button

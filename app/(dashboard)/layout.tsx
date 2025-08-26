@@ -13,6 +13,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
+import { NavigationSidebar } from '@/components/navigation/navigation-sidebar';
+import { BottomTabNavigation } from '@/components/navigation/bottom-tab-navigation';
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -75,7 +77,7 @@ function UserMenu() {
 function Header() {
   return (
     <header className="bg-cpn-dark border-b border-cpn-gray/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <span className="text-2xl font-bold text-cpn-yellow">CPN</span>
           <span className="ml-2 text-lg text-cpn-white">Calculator</span>
@@ -92,11 +94,17 @@ function Header() {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <section className="flex flex-col min-h-screen bg-cpn-dark text-cpn-white">
-      <Header />
-      <main className="flex-1">
-        {children}
-      </main>
-    </section>
+    <div className="min-h-screen bg-cpn-dark text-cpn-white">
+      <NavigationSidebar />
+      <div className="md:ml-64">
+        <Header />
+        <main className="flex-1 pb-16 md:pb-0">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            {children}
+          </div>
+        </main>
+      </div>
+      <BottomTabNavigation />
+    </div>
   );
 }

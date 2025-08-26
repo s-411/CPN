@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation'
 import { OnboardingProvider, useOnboarding } from '@/contexts/onboarding-context'
 import { DataEntryForm } from '@/components/forms/data-entry-form'
 import type { DataEntryData } from '@/lib/utils/session-storage'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { initializePWA, queueForSync, getPWACapabilities } from '@/lib/utils/pwa'
 
 function DataEntryContent() {
   const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
   const { 
     saveDataEntryData, 
     goToNextStep, 
@@ -18,14 +19,19 @@ function DataEntryContent() {
     canNavigateToStep 
   } = useOnboarding()
 
+  // Set client-side flag
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Check if user can access this step (profile must be completed)
   useEffect(() => {
-    if (!canNavigateToStep('dataEntry')) {
+    if (isClient && !canNavigateToStep('dataEntry')) {
       console.log('Redirecting to profile step - prerequisites not met')
       router.push('/add-girl')
       return
     }
-  }, [canNavigateToStep, router])
+  }, [isClient, canNavigateToStep, router])
 
   const handleDataEntrySubmit = async (data: DataEntryData) => {
     try {
@@ -74,8 +80,37 @@ function DataEntryContent() {
     }
   }, [])
 
+  // Show loading only on client-side if we can't access this step yet
+  if (!isClient) {
+    // Return the main layout to prevent hydration mismatch
+    return (
+      <main
+        className="min-h-screen bg-cpn-dark text-cpn-white p-4 sm:p-6 lg:p-8 pt-safe-top pb-safe-bottom pl-safe-left pr-safe-right sm:pt-4 sm:pb-6 sm:pl-6 sm:pr-6"
+        role="main"
+        aria-labelledby="page-title"
+      >
+        {/* Background pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cpn-dark via-cpn-dark to-gray-900 opacity-50" />
+        
+        {/* Page container */}
+        <div className="relative max-w-md mx-auto">
+          {/* Loading skeleton that matches the main layout */}
+          <div className="animate-pulse">
+            <div className="text-center mb-0">
+              <div className="w-16 h-16 mx-auto mb-4 bg-cpn-yellow rounded-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-cpn-dark">CPN</span>
+              </div>
+              <div className="h-8 bg-cpn-gray/20 rounded mb-2 w-48 mx-auto"></div>
+              <div className="h-6 bg-cpn-gray/20 rounded mb-6 w-64 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   // Show loading if we can't access this step yet
-  if (!canNavigateToStep('dataEntry')) {
+  if (isClient && !canNavigateToStep('dataEntry')) {
     return (
       <main 
         className="min-h-screen bg-cpn-dark text-cpn-white flex items-center justify-center"
@@ -93,7 +128,7 @@ function DataEntryContent() {
 
   return (
     <main
-      className="min-h-screen bg-cpn-dark text-cpn-white p-4 sm:p-6 lg:p-8"
+      className="min-h-screen bg-cpn-dark text-cpn-white p-4 sm:p-6 lg:p-8 pt-safe-top pb-safe-bottom pl-safe-left pr-safe-right sm:pt-4 sm:pb-6 sm:pl-6 sm:pr-6"
       role="main"
       aria-labelledby="page-title"
     >
@@ -118,7 +153,7 @@ function DataEntryContent() {
             </h1>
             
             <p className="text-cpn-gray text-lg leading-relaxed font-klarheit">
-              Enter the details of a date/event whith her.
+              Enter the details of a date/event with her.
             </p>
           </div>
 
@@ -175,17 +210,6 @@ function DataEntryContent() {
         </div>
       </div>
 
-      {/* Mobile-specific optimizations */}
-      <style jsx>{`
-        @media (max-width: 640px) {
-          main {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-          }
-        }
-      `}</style>
     </main>
   )
 }

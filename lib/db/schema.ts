@@ -182,11 +182,40 @@ export const shareAnalytics = pgTable('share_analytics', {
   referralCodeIdx: index('idx_share_analytics_referral_code').on(table.referralCode),
 }));
 
+export const girls = pgTable('girls', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  teamId: integer('team_id')
+    .notNull()
+    .references(() => teams.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 100 }).notNull(),
+  age: integer('age').notNull(),
+  nationality: varchar('nationality', { length: 50 }).notNull(),
+  rating: integer('rating').notNull(),
+  status: varchar('status', { length: 20 }).notNull().default('active'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+}, (table) => ({
+  userIdIdx: index('idx_girls_user_id').on(table.userId),
+  teamIdIdx: index('idx_girls_team_id').on(table.teamId),
+  userTeamIdx: index('idx_girls_user_team').on(table.userId, table.teamId),
+  statusIdx: index('idx_girls_status').on(table.status),
+  deletedAtIdx: index('idx_girls_deleted_at').on(table.deletedAt),
+  nameCheck: check('girls_name_check', sql`LENGTH(TRIM(${table.name})) > 0`),
+  ageCheck: check('girls_age_check', sql`${table.age} >= 18 AND ${table.age} <= 120`),
+  ratingCheck: check('girls_rating_check', sql`${table.rating} >= 1 AND ${table.rating} <= 10`),
+  statusCheck: check('girls_status_check', sql`${table.status} IN ('active', 'inactive', 'archived')`),
+}));
+
 // Relations
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
   invitations: many(invitations),
+  girls: many(girls),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -197,6 +226,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   cpnScores: many(cpnScores),
   userAchievements: many(userAchievements),
   shareAnalytics: many(shareAnalytics),
+  girls: many(girls),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -294,6 +324,17 @@ export const shareAnalyticsRelations = relations(shareAnalytics, ({ one }) => ({
   }),
 }));
 
+export const girlsRelations = relations(girls, ({ one }) => ({
+  user: one(users, {
+    fields: [girls.userId],
+    references: [users.id],
+  }),
+  team: one(teams, {
+    fields: [girls.teamId],
+    references: [teams.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
@@ -316,6 +357,8 @@ export type UserAchievement = typeof userAchievements.$inferSelect;
 export type NewUserAchievement = typeof userAchievements.$inferInsert;
 export type ShareAnalytic = typeof shareAnalytics.$inferSelect;
 export type NewShareAnalytic = typeof shareAnalytics.$inferInsert;
+export type Girl = typeof girls.$inferSelect;
+export type NewGirl = typeof girls.$inferInsert;
 
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
@@ -352,4 +395,8 @@ export enum ActivityType {
   REMOVE_TEAM_MEMBER = 'REMOVE_TEAM_MEMBER',
   INVITE_TEAM_MEMBER = 'INVITE_TEAM_MEMBER',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
+  CREATE_GIRL = 'CREATE_GIRL',
+  UPDATE_GIRL = 'UPDATE_GIRL',
+  DELETE_GIRL = 'DELETE_GIRL',
+  ARCHIVE_GIRL = 'ARCHIVE_GIRL',
 }

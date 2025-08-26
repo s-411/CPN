@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Create a comprehensive Girl Management interface that allows users to efficiently track and organize their dating data through updated sidebar navigation (replacing "Profiles" with "Girls"), a responsive card-based display system with empty states, and a streamlined modal-based creation workflow. The implementation focuses on providing intuitive organization and analysis tools for dating data management with immediate feedback and consistent user experience.

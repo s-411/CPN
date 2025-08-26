@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html
-        lang="en"
+        lang="en-US"
         className="dark"
       >
         <body className="min-h-[100dvh] bg-cpn-dark text-cpn-white font-body antialiased">

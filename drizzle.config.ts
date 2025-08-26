@@ -3,7 +3,7 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   schema: "./lib/db/schema.ts",
-  out: "./drizzle",
+  out: "./lib/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
     // Use SUPABASE_DATABASE_URL if present, otherwise POSTGRES_URL
