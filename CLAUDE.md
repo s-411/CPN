@@ -178,6 +178,92 @@ hover:bg-cpn-yellow/80   // Button hover
 focus:ring-cpn-yellow/50 // Focus rings
 ```
 
+### Typography System
+
+The CPN application uses two custom brand fonts:
+
+#### Font Face Declarations
+```css
+@font-face {
+  font-family: 'National2Condensed';
+  src: url('/fonts/National-2-Condensed-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ESKlarheit';
+  src: url('/fonts/ESKlarheitGrotesk-Rg.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+```
+
+#### Tailwind Font Families
+```typescript
+fontFamily: {
+  'heading': ['National2Condensed', 'Arial Black', 'sans-serif'],
+  'body': ['ESKlarheit', 'Inter', 'system-ui', 'sans-serif'],
+  sans: ['ESKlarheit', 'Inter', 'system-ui', 'sans-serif'],
+}
+```
+
+#### Usage in Components
+```jsx
+// Headings - National2Condensed (bold, condensed)
+<h1 className="font-heading text-2xl">CPN Calculator</h1>
+
+// Body text - ESKlarheit (regular weight)
+<p className="font-body text-base">Your dating analytics dashboard</p>
+<div className="font-sans">Default text uses ESKlarheit</div>
+```
+
+## CSS & Component Style Guidelines
+
+### Multi-line Tailwind CSS Formatting
+
+We use a unique multi-line formatting style for Tailwind CSS classes in HTML markup and JSX components:
+
+- Each responsive size gets its own dedicated line
+- Start with smallest size (no responsive prefix) on top
+- Each line below represents the next responsive size up
+- All lines are vertically aligned
+- `hover:` and `focus:` classes get their own dedicated lines
+- Custom CSS classes (if any) go at the start of the first line
+- We implement an additional `xs` breakpoint at 400px
+
+**Example of multi-line Tailwind CSS classes:**
+
+```jsx
+<div className="custom-cta bg-gray-50 dark:bg-gray-900 p-4 rounded cursor-pointer w-full
+                hover:bg-gray-100 dark:hover:bg-gray-800
+                xs:p-6
+                sm:p-8 sm:font-medium
+                md:p-10 md:text-lg
+                lg:p-12 lg:text-xl lg:font-semibold lg:w-3/5
+                xl:p-14 xl:text-2xl
+                2xl:p-16 2xl:text-3xl 2xl:font-bold 2xl:w-3/4">
+  I'm a call-to-action!
+</div>
+```
+
+### Development Best Practices
+
+#### Core Principles
+- **Keep It Simple**: Implement code in the fewest lines possible, avoid over-engineering
+- **Optimize for Readability**: Prioritize code clarity over micro-optimizations
+- **DRY (Don't Repeat Yourself)**: Extract repeated logic to methods/components
+- **File Structure**: Keep files focused on single responsibility with consistent naming
+
+#### Component Guidelines
+- Write self-documenting code with clear variable names
+- Add comments for "why" not "what"
+- Extract repeated UI markup to reusable components
+- Create utility functions for common operations
+- Group related functionality together
+
 ## Key Implementation Details
 
 ### Database Queries
