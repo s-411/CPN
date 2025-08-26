@@ -5,12 +5,17 @@ import { OnboardingProvider, useOnboarding } from '@/contexts/onboarding-context
 import { ProfileForm } from '@/components/forms/profile-form'
 import type { ProfileFormData } from '@/types/profile'
 import { useEffect, useState } from 'react'
+import { useUser } from '@clerk/nextjs'
 import { initializePWA, queueForSync, getPWACapabilities } from '@/lib/utils/pwa'
+import { saveUserProfile } from '@/app/actions/onboarding-actions'
+import { toast } from 'sonner'
 
 function AddGirlContent() {
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
   const { saveProfileData, goToNextStep, progress } = useOnboarding()
+  const { user, isSignedIn } = useUser()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Set client-side flag
   useEffect(() => {
@@ -18,9 +23,31 @@ function AddGirlContent() {
   }, [])
 
   const handleProfileSubmit = async (data: ProfileFormData) => {
+    if (isSubmitting) return
+    
     try {
-      // Save the profile data to context
+      setIsSubmitting(true)
+      
+      // Save the profile data to context (for non-authenticated users)
       saveProfileData(data)
+      
+      // If user is authenticated, also save to database
+      if (isSignedIn && user) {
+        const formData = new FormData()
+        formData.append('firstName', data.firstName)
+        formData.append('age', data.age.toString())
+        formData.append('ethnicity', data.ethnicity || '')
+        formData.append('rating', data.rating.toString())
+        
+        const result = await saveUserProfile(formData)
+        
+        if (!result.success) {
+          toast.error(result.error || 'Failed to save profile')
+          return
+        } else {
+          toast.success('Profile saved successfully!')
+        }
+      }
       
       // Navigate to the next step in the onboarding flow
       goToNextStep()
@@ -36,7 +63,9 @@ function AddGirlContent() {
       router.push('/data-entry')
     } catch (error) {
       console.error('Failed to submit profile:', error)
-      // Error is handled by the ProfileForm component
+      toast.error('Failed to submit profile. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -113,6 +142,7 @@ function AddGirlContent() {
           <ProfileForm
             onSubmit={handleProfileSubmit}
             showBackButton={false}
+            isLoading={isSubmitting}
             className="animate-fade-in"
           />
         </section>

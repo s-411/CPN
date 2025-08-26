@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, TrendingUp, Users, Target, Calculator, ArrowRight } from 'lucide-react';
+import { Trophy, TrendingUp, Users, Target, Calculator, ArrowRight, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/use-auth';
 import useSWR from 'swr';
@@ -75,6 +75,13 @@ function QuickActions() {
       color: 'bg-cpn-yellow text-cpn-dark hover:bg-cpn-yellow/80'
     },
     {
+      title: 'Manage Data',
+      description: 'Add or edit interaction data',
+      href: '/data-management',
+      icon: BarChart3,
+      color: 'bg-transparent border-2 border-cpn-gray text-cpn-gray hover:bg-cpn-gray hover:text-cpn-dark'
+    },
+    {
       title: 'View CPN Results',
       description: 'See your detailed analytics',
       href: '/cpn-results',
@@ -84,7 +91,7 @@ function QuickActions() {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {actions.map((action) => (
         <Link key={action.title} href={action.href}>
           <Card className="bg-cpn-dark border-cpn-gray/20 hover:border-cpn-yellow/50 transition-all cursor-pointer group">
@@ -107,12 +114,18 @@ function QuickActions() {
 }
 
 function RecentActivity() {
-  // This would fetch recent activity data
-  const activities = [
-    { date: '2024-01-20', type: 'Session Completed', score: 82 },
-    { date: '2024-01-19', type: 'Achievement Unlocked', achievement: 'First Timer' },
-    { date: '2024-01-18', type: 'Session Completed', score: 75 }
-  ];
+  const { data: activityData } = useSWR('/api/user/activity', fetcher);
+  
+  const formatActivityType = (type: string) => {
+    switch (type) {
+      case 'session': return 'Session Completed';
+      case 'achievement': return 'Achievement Unlocked';
+      case 'score_update': return 'CPN Score Updated';
+      default: return type;
+    }
+  };
+  
+  const activities = activityData?.activities || [];
 
   return (
     <Card className="bg-cpn-dark border-cpn-gray/20">
@@ -121,22 +134,32 @@ function RecentActivity() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {activities.map((activity, index) => (
-            <div key={index} className="flex items-center justify-between py-2 border-b border-cpn-gray/10 last:border-0">
-              <div>
-                <p className="text-sm text-cpn-white">{activity.type}</p>
-                <p className="text-xs text-cpn-gray">{activity.date}</p>
-              </div>
-              {activity.score && (
-                <span className="text-cpn-yellow font-bold">{activity.score}</span>
-              )}
-              {activity.achievement && (
-                <span className="text-xs bg-cpn-yellow/20 text-cpn-yellow px-2 py-1 rounded">
-                  {activity.achievement}
-                </span>
-              )}
+          {activities.length === 0 ? (
+            <div className="text-center py-8 text-cpn-gray">
+              <p>No recent activity</p>
+              <p className="text-xs mt-1">Start tracking to see your activity here</p>
             </div>
-          ))}
+          ) : (
+            activities.map((activity: any, index: number) => (
+              <div key={index} className="flex items-center justify-between py-2 border-b border-cpn-gray/10 last:border-0">
+                <div>
+                  <p className="text-sm text-cpn-white">{formatActivityType(activity.type)}</p>
+                  <p className="text-xs text-cpn-gray">{activity.date}</p>
+                </div>
+                {activity.type === 'session' && activity.details?.nuts && (
+                  <span className="text-cpn-yellow font-bold">{activity.details.nuts} nuts</span>
+                )}
+                {activity.type === 'achievement' && activity.details?.achievementName && (
+                  <span className="text-xs bg-cpn-yellow/20 text-cpn-yellow px-2 py-1 rounded">
+                    {activity.details.achievementName}
+                  </span>
+                )}
+                {activity.type === 'score_update' && activity.details?.score && (
+                  <span className="text-cpn-yellow font-bold">Score: {activity.details.score}</span>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </CardContent>
     </Card>

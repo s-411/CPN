@@ -3,7 +3,9 @@ import postgres from 'postgres';
 import * as schema from './schema';
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Load environment variables from multiple files
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 // Get database URL - prefer Supabase direct connection, fallback to local PostgreSQL
 const databaseUrl = process.env.SUPABASE_DATABASE_URL || process.env.POSTGRES_URL;

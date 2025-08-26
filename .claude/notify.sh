@@ -30,24 +30,27 @@ play_sound() {
     fi
 }
 
-# Function to generate a ding sound if no custom sounds exist
-generate_ding_sound() {
-    local ding_file="$SOUNDS_DIR/ding.wav"
+# Function to get the best available sound file
+get_notification_sound() {
+    # First check for custom sounds in the sounds directory
+    local custom_ding="$SOUNDS_DIR/ding.wav"
+    local custom_notification="$SOUNDS_DIR/notification.aiff"
     
-    if [[ ! -f "$ding_file" ]]; then
-        echo "Generating default ding sound..."
-        
-        # Try to generate a simple ding using sox if available
-        if command -v sox >/dev/null 2>&1; then
-            sox -n "$ding_file" synth 0.3 sine 800 fade 0 0.3 0.1 2>/dev/null
-        else
-            # Create a simple text file as placeholder
-            echo "# This is a placeholder for the ding sound" > "$ding_file.txt"
-        fi
+    if [[ -f "$custom_ding" ]]; then
+        echo "$custom_ding"
+        return
+    elif [[ -f "$custom_notification" ]]; then
+        echo "$custom_notification"
+        return
     fi
     
-    if [[ -f "$ding_file" ]]; then
-        echo "$ding_file"
+    # Use macOS system sounds as fallback
+    if [[ -f "/System/Library/Sounds/Ping.aiff" ]]; then
+        echo "/System/Library/Sounds/Ping.aiff"
+    elif [[ -f "/System/Library/Sounds/Glass.aiff" ]]; then
+        echo "/System/Library/Sounds/Glass.aiff"
+    elif [[ -f "/System/Library/Sounds/Tink.aiff" ]]; then
+        echo "/System/Library/Sounds/Tink.aiff"
     else
         echo ""
     fi
@@ -60,7 +63,7 @@ notify() {
     case "$event_type" in
         "task_complete")
             echo "🔔 Task completed! $(date '+%H:%M:%S')"
-            sound_file=$(generate_ding_sound)
+            sound_file=$(get_notification_sound)
             if [[ -n "$sound_file" ]]; then
                 play_sound "$sound_file"
             else
@@ -69,7 +72,7 @@ notify() {
             ;;
         "human_input")
             echo "⚠️  Human input required! $(date '+%H:%M:%S')"
-            sound_file=$(generate_ding_sound)
+            sound_file=$(get_notification_sound)
             if [[ -n "$sound_file" ]]; then
                 play_sound "$sound_file"
                 sleep 0.2
@@ -82,11 +85,21 @@ notify() {
             ;;
         "error")
             echo "❌ Error occurred! $(date '+%H:%M:%S')"
-            echo -e "\a"
+            sound_file=$(get_notification_sound)
+            if [[ -n "$sound_file" ]]; then
+                play_sound "$sound_file"
+            else
+                echo -e "\a"
+            fi
             ;;
         *)
             echo "🔔 Claude Code notification: $event_type $(date '+%H:%M:%S')"
-            echo -e "\a"
+            sound_file=$(get_notification_sound)
+            if [[ -n "$sound_file" ]]; then
+                play_sound "$sound_file"
+            else
+                echo -e "\a"
+            fi
             ;;
     esac
 }

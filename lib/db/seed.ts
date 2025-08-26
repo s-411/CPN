@@ -133,35 +133,60 @@ async function seedAchievements() {
 async function seed() {
   const email = 'test@test.com';
   const password = 'admin123';
-  const passwordHash = await hashPassword(password);
+  
+  // Check if user already exists
+  let user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
 
-  const [user] = await db
-    .insert(users)
-    .values([
-      {
-        email: email,
-        passwordHash: passwordHash,
-        role: "owner",
-      },
-    ])
-    .returning();
+  if (user.length === 0) {
+    const passwordHash = await hashPassword(password);
+    [user[0]] = await db
+      .insert(users)
+      .values([
+        {
+          email: email,
+          passwordHash: passwordHash,
+          role: "owner",
+        },
+      ])
+      .returning();
+    console.log('Initial user created.');
+  } else {
+    console.log('Initial user already exists.');
+  }
 
-  console.log('Initial user created.');
+  // Check if team already exists for this user
+  const existingTeamMember = await db
+    .select()
+    .from(teamMembers)
+    .where(eq(teamMembers.userId, user[0].id))
+    .limit(1);
 
-  const [team] = await db
-    .insert(teams)
-    .values({
-      name: 'Test Team',
-    })
-    .returning();
+  let team;
+  if (existingTeamMember.length === 0) {
+    [team] = await db
+      .insert(teams)
+      .values({
+        name: 'Test Team',
+      })
+      .returning();
 
-  await db.insert(teamMembers).values({
-    teamId: team.id,
-    userId: user.id,
-    role: 'owner',
-  });
+    await db.insert(teamMembers).values({
+      teamId: team.id,
+      userId: user[0].id,
+      role: 'owner',
+    });
+    console.log('Test team created.');
+  } else {
+    console.log('User already has a team.');
+  }
 
-  await createStripeProducts();
+  // Skip Stripe products for now - use placeholder keys
+  console.log('Skipping Stripe product creation (placeholder keys)');
+  
   await seedAchievements();
 }
 

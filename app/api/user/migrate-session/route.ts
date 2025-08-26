@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { migrateSessionDataToUser, type CPNOnboardingData } from '@/lib/supabase/user-mapping';
+import { migrateSessionData } from '@/app/actions/onboarding-actions';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,29 +13,26 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { clerkId, sessionData }: { 
-      clerkId: string; 
-      sessionData: CPNOnboardingData; 
-    } = body;
-
-    // Verify the clerk ID matches the authenticated user
-    if (clerkId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const { sessionData } = body;
 
     // Validate session data
-    if (!sessionData || (!sessionData.profile && !sessionData.interactions)) {
+    if (!sessionData || (!sessionData.profile && (!sessionData.interactions || sessionData.interactions.length === 0))) {
       return NextResponse.json({ error: 'No session data to migrate' }, { status: 400 });
     }
 
-    // Perform migration
-    await migrateSessionDataToUser(clerkId, sessionData);
+    // Perform migration using server action
+    const result = await migrateSessionData(sessionData);
+
+    if (!result.success) {
+      return NextResponse.json({ 
+        error: result.error || 'Migration failed'
+      }, { status: 400 });
+    }
 
     return NextResponse.json({ 
       success: true,
-      message: 'Session data migrated successfully',
-      migratedProfile: !!sessionData.profile,
-      migratedInteractions: sessionData.interactions?.length || 0,
+      message: result.message,
+      details: result.details
     });
 
   } catch (error) {

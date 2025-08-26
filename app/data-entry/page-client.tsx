@@ -5,7 +5,10 @@ import { OnboardingProvider, useOnboarding } from '@/contexts/onboarding-context
 import { DataEntryForm } from '@/components/forms/data-entry-form'
 import type { DataEntryData } from '@/lib/utils/session-storage'
 import { useEffect, useState } from 'react'
+import { useUser } from '@clerk/nextjs'
 import { initializePWA, queueForSync, getPWACapabilities } from '@/lib/utils/pwa'
+import { saveUserInteraction, completeOnboarding } from '@/app/actions/onboarding-actions'
+import { toast } from 'sonner'
 
 function DataEntryContent() {
   const router = useRouter()
@@ -18,6 +21,8 @@ function DataEntryContent() {
     data,
     canNavigateToStep 
   } = useOnboarding()
+  const { user, isSignedIn } = useUser()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Set client-side flag
   useEffect(() => {
@@ -34,9 +39,47 @@ function DataEntryContent() {
   }, [isClient, canNavigateToStep, router])
 
   const handleDataEntrySubmit = async (data: DataEntryData) => {
+    if (isSubmitting) return
+    
     try {
+      setIsSubmitting(true)
+      
       // Save the data entry data to context
       saveDataEntryData(data)
+      
+      // If user is authenticated, also save to database and complete onboarding
+      if (isSignedIn && user) {
+        // Save interaction data
+        for (const interaction of data.interactions || []) {
+          const formData = new FormData()
+          formData.append('date', interaction.date)
+          formData.append('cost', interaction.cost.toString())
+          formData.append('timeMinutes', interaction.timeMinutes.toString())
+          formData.append('nuts', interaction.nuts.toString())
+          formData.append('notes', interaction.notes || '')
+          
+          const result = await saveUserInteraction(formData)
+          
+          if (!result.success) {
+            toast.error(result.error || 'Failed to save interaction data')
+            return
+          }
+        }
+        
+        // Complete onboarding and calculate CPN score
+        const completionResult = await completeOnboarding()
+        
+        if (!completionResult.success) {
+          toast.error(completionResult.error || 'Failed to complete onboarding')
+          return
+        }
+        
+        toast.success(`Onboarding complete! Your CPN score: ${completionResult.cpnScore}`)
+        
+        // Navigate directly to results
+        router.push('/cpn-results')
+        return
+      }
       
       // Navigate to the next step
       goToNextStep()
@@ -48,11 +91,13 @@ function DataEntryContent() {
         console.log('Data entry queued for background sync (offline)')
       }
       
-      // Navigate to sign up page after data entry
+      // Navigate to sign up page after data entry (for unauthenticated users)
       router.push('/sign-up?redirect_url=/cpn-results')
     } catch (error) {
       console.error('Failed to submit data entry:', error)
-      // Error is handled by the DataEntryForm component
+      toast.error('Failed to submit data. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -181,6 +226,7 @@ function DataEntryContent() {
             onSubmit={handleDataEntrySubmit}
             onBack={handleBackNavigation}
             showBackButton={true}
+            isLoading={isSubmitting}
             className="animate-fade-in"
           />
         </section>

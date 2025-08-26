@@ -200,8 +200,8 @@ export default function GirlManagementPage() {
   };
 
   const handleManageData = (id: number) => {
-    // TODO: Navigate to data management page
-    console.log('Managing data for girl:', id);
+    // Navigate to data management page
+    window.location.href = '/data-management';
   };
 
   return (
