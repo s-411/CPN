@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { deleteGirl, updateGirl, getGirlById } from '@/lib/db/girls-queries';
 
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: Props
 ) {
+  const params = await props.params;
   try {
     // Check authentication first
     const { userId } = await auth();
@@ -38,8 +43,9 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: Props
 ) {
+  const params = await props.params;
   try {
     // Check authentication first
     const { userId } = await auth();
@@ -73,8 +79,9 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: Props
 ) {
+  const params = await props.params;
   try {
     // Check authentication first
     const { userId } = await auth();

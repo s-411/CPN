@@ -50,20 +50,18 @@ function DataEntryContent() {
       // If user is authenticated, also save to database and complete onboarding
       if (isSignedIn && user) {
         // Save interaction data
-        for (const interaction of data.interactions || []) {
-          const formData = new FormData()
-          formData.append('date', interaction.date)
-          formData.append('cost', interaction.cost.toString())
-          formData.append('timeMinutes', interaction.timeMinutes.toString())
-          formData.append('nuts', interaction.nuts.toString())
-          formData.append('notes', interaction.notes || '')
-          
-          const result = await saveUserInteraction(formData)
-          
-          if (!result.success) {
-            toast.error(result.error || 'Failed to save interaction data')
-            return
-          }
+        const formData = new FormData()
+        formData.append('date', data.date)
+        formData.append('cost', data.cost.toString())
+        formData.append('timeMinutes', data.time.toString())
+        formData.append('nuts', data.nuts.toString())
+        formData.append('notes', data.notes || '')
+        
+        const result = await saveUserInteraction(formData)
+        
+        if (!result.success) {
+          toast.error(result.error || 'Failed to save interaction data')
+          return
         }
         
         // Complete onboarding and calculate CPN score

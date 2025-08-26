@@ -29,6 +29,7 @@ const interactionSchema = z.object({
   cost: z.number().min(0, 'Cost must be positive'),
   timeMinutes: z.number().min(1, 'Time must be at least 1 minute'),
   nuts: z.number().min(0, 'Nuts must be 0 or positive'),
+  girlId: z.number().optional(),
   notes: z.string().optional()
 });
 
@@ -116,7 +117,10 @@ export async function saveUserProfile(formData: FormData) {
       await db
         .update(userProfiles)
         .set({
-          ...validatedData,
+          firstName: validatedData.firstName,
+          age: validatedData.age,
+          ethnicity: validatedData.ethnicity,
+          rating: validatedData.rating.toString(),
           updatedAt: new Date()
         })
         .where(eq(userProfiles.clerkId, clerkUserId));
@@ -125,7 +129,10 @@ export async function saveUserProfile(formData: FormData) {
       const profileData: NewUserProfile = {
         userId: user.id,
         clerkId: clerkUserId,
-        ...validatedData
+        firstName: validatedData.firstName,
+        age: validatedData.age,
+        ethnicity: validatedData.ethnicity,
+        rating: validatedData.rating.toString()
       };
 
       await db.insert(userProfiles).values(profileData);
@@ -163,11 +170,13 @@ export async function saveUserInteraction(formData: FormData) {
     }
 
     // Validate form data
+    const girlIdStr = formData.get('girlId') as string;
     const rawData = {
       date: formData.get('date') as string,
       cost: parseFloat(formData.get('cost') as string),
       timeMinutes: parseInt(formData.get('timeMinutes') as string),
       nuts: parseInt(formData.get('nuts') as string),
+      girlId: girlIdStr ? parseInt(girlIdStr) : undefined,
       notes: formData.get('notes') as string || undefined
     };
 
@@ -195,6 +204,7 @@ export async function saveUserInteraction(formData: FormData) {
       userId: user.id,
       clerkId: clerkUserId,
       profileId: profile[0].id,
+      girlId: validatedData.girlId || null,
       date: validatedData.date,
       cost: validatedData.cost.toString(), // Convert to decimal string
       timeMinutes: validatedData.timeMinutes,
@@ -354,7 +364,10 @@ async function saveUserProfileFromData(clerkUserId: string, profileData: any) {
     const newProfile: NewUserProfile = {
       userId: user.id,
       clerkId: clerkUserId,
-      ...validatedData
+      firstName: validatedData.firstName,
+      age: validatedData.age,
+      ethnicity: validatedData.ethnicity,
+      rating: validatedData.rating.toString()
     };
 
     await db.insert(userProfiles).values(newProfile);

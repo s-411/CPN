@@ -2,6 +2,7 @@ import { eq, and, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
 import { girls, users, teams, type Girl, type NewGirl } from './schema';
 import { getUser } from './queries';
+import { generateGirlId } from '@/lib/utils/id-generator';
 
 /**
  * Get all girls for the current user
@@ -28,7 +29,7 @@ export async function getGirlsForUser(): Promise<Girl[]> {
 /**
  * Get a specific girl by ID for the current user
  */
-export async function getGirlById(id: number): Promise<Girl | null> {
+export async function getGirlById(id: string): Promise<Girl | null> {
   const user = await getUser();
   
   if (!user?.id) {
@@ -73,6 +74,7 @@ export async function createGirl(girlData: Omit<NewGirl, 'userId' | 'teamId' | '
   }
 
   const newGirl: NewGirl = {
+    id: generateGirlId(), // Generate random ID
     ...girlData,
     userId: user.id,
     teamId: userWithTeam.teamMembers[0].teamId,
@@ -90,7 +92,7 @@ export async function createGirl(girlData: Omit<NewGirl, 'userId' | 'teamId' | '
 /**
  * Update an existing girl
  */
-export async function updateGirl(id: number, updates: Partial<Omit<Girl, 'id' | 'userId' | 'teamId' | 'createdAt'>>): Promise<Girl> {
+export async function updateGirl(id: string, updates: Partial<Omit<Girl, 'id' | 'userId' | 'teamId' | 'createdAt'>>): Promise<Girl> {
   const user = await getUser();
   
   if (!user?.id) {
@@ -122,7 +124,7 @@ export async function updateGirl(id: number, updates: Partial<Omit<Girl, 'id' | 
 /**
  * Soft delete a girl
  */
-export async function deleteGirl(id: number): Promise<void> {
+export async function deleteGirl(id: string): Promise<void> {
   const user = await getUser();
   
   if (!user?.id) {
@@ -167,13 +169,13 @@ export async function getGirlsCount(): Promise<number> {
 /**
  * Archive a girl (set status to archived)
  */
-export async function archiveGirl(id: number): Promise<Girl> {
+export async function archiveGirl(id: string): Promise<Girl> {
   return updateGirl(id, { status: 'archived' });
 }
 
 /**
  * Activate a girl (set status to active)
  */
-export async function activateGirl(id: number): Promise<Girl> {
+export async function activateGirl(id: string): Promise<Girl> {
   return updateGirl(id, { status: 'active' });
 }

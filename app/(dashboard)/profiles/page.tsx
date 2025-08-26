@@ -199,9 +199,9 @@ export default function GirlManagementPage() {
     }
   };
 
-  const handleManageData = (id: number) => {
-    // Navigate to data management page
-    window.location.href = '/data-management';
+  const handleManageData = (id: string) => {
+    // Navigate to girl-specific data management page
+    window.location.href = `/data-management/${id}`;
   };
 
   return (

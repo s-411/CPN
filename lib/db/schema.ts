@@ -101,6 +101,7 @@ export const userInteractions = pgTable('user_interactions', {
   userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
   clerkId: varchar('clerk_id', { length: 255 }).notNull(),
   profileId: integer('profile_id').references(() => userProfiles.id, { onDelete: 'cascade' }),
+  girlId: varchar('girl_id', { length: 20 }).references(() => girls.id, { onDelete: 'set null' }),
   date: date('date').notNull(),
   cost: decimal('cost', { precision: 10, scale: 2 }).notNull(),
   timeMinutes: integer('time_minutes').notNull(),
@@ -111,6 +112,7 @@ export const userInteractions = pgTable('user_interactions', {
 }, (table) => ({
   userIdIdx: index('idx_user_interactions_user_id').on(table.userId),
   clerkIdIdx: index('idx_user_interactions_clerk_id').on(table.clerkId),
+  girlIdIdx: index('idx_user_interactions_girl_id').on(table.girlId),
   dateIdx: index('idx_user_interactions_date').on(table.date),
 }));
 
@@ -183,7 +185,7 @@ export const shareAnalytics = pgTable('share_analytics', {
 }));
 
 export const girls = pgTable('girls', {
-  id: serial('id').primaryKey(),
+  id: varchar('id', { length: 20 }).primaryKey(), // Changed to varchar for random IDs
   userId: integer('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
@@ -279,6 +281,10 @@ export const userInteractionsRelations = relations(userInteractions, ({ one }) =
   profile: one(userProfiles, {
     fields: [userInteractions.profileId],
     references: [userProfiles.id],
+  }),
+  girl: one(girls, {
+    fields: [userInteractions.girlId],
+    references: [girls.id],
   }),
 }));
 

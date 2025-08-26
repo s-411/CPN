@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
 import { userInteractions, userAchievements, achievements, cpnScores } from '@/lib/db/schema';
-import { eq, desc, union } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { getUserByClerkId } from '@/lib/db/queries';
 
 export async function GET() {
@@ -28,14 +28,12 @@ export async function GET() {
     // Get recent interactions (sessions)
     const recentInteractions = await db
       .select({
-        type: 'session',
+        type: sql<string>`'session'`,
         date: userInteractions.date,
         createdAt: userInteractions.createdAt,
-        details: {
-          cost: userInteractions.cost,
-          nuts: userInteractions.nuts,
-          timeMinutes: userInteractions.timeMinutes
-        }
+        cost: userInteractions.cost,
+        nuts: userInteractions.nuts,
+        timeMinutes: userInteractions.timeMinutes
       })
       .from(userInteractions)
       .where(eq(userInteractions.clerkId, clerkUserId))
@@ -45,14 +43,12 @@ export async function GET() {
     // Get recent achievements
     const recentAchievements = await db
       .select({
-        type: 'achievement',
+        type: sql<string>`'achievement'`,
         date: userAchievements.earnedAt,
         createdAt: userAchievements.earnedAt,
-        details: {
-          achievementName: achievements.name,
-          achievementDescription: achievements.description,
-          badgeColor: achievements.badgeColor
-        }
+        achievementName: achievements.name,
+        achievementDescription: achievements.description,
+        badgeColor: achievements.badgeColor
       })
       .from(userAchievements)
       .innerJoin(achievements, eq(userAchievements.achievementId, achievements.id))
@@ -63,13 +59,11 @@ export async function GET() {
     // Get recent CPN score calculations
     const recentScores = await db
       .select({
-        type: 'score_update',
+        type: sql<string>`'score_update'`,
         date: cpnScores.createdAt,
         createdAt: cpnScores.createdAt,
-        details: {
-          score: cpnScores.score,
-          categoryScores: cpnScores.categoryScores
-        }
+        score: cpnScores.score,
+        categoryScores: cpnScores.categoryScores
       })
       .from(cpnScores)
       .where(eq(cpnScores.userId, user.id))
@@ -86,9 +80,9 @@ export async function GET() {
         date: interaction.date || interaction.createdAt.toISOString().split('T')[0],
         createdAt: interaction.createdAt.toISOString(),
         details: {
-          cost: interaction.details.cost,
-          nuts: interaction.details.nuts,
-          timeMinutes: interaction.details.timeMinutes
+          cost: interaction.cost,
+          nuts: interaction.nuts,
+          timeMinutes: interaction.timeMinutes
         }
       });
     }
@@ -100,9 +94,9 @@ export async function GET() {
         date: achievement.date.toISOString().split('T')[0],
         createdAt: achievement.createdAt.toISOString(),
         details: {
-          achievementName: achievement.details.achievementName,
-          achievementDescription: achievement.details.achievementDescription,
-          badgeColor: achievement.details.badgeColor
+          achievementName: achievement.achievementName,
+          achievementDescription: achievement.achievementDescription,
+          badgeColor: achievement.badgeColor
         }
       });
     }
@@ -114,7 +108,8 @@ export async function GET() {
         date: score.date.toISOString().split('T')[0],
         createdAt: score.createdAt.toISOString(),
         details: {
-          score: score.details.score
+          score: score.score,
+          categoryScores: score.categoryScores
         }
       });
     }
